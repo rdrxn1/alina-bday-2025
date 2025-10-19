@@ -1,0 +1,165 @@
+{
+  "siteTitle": "Alina's Pixel Desktop",
+  "tagline": "A lavender night made just for you.",
+  "config": {
+    "backgroundAudio": "/audio/lofi-breeze.mp3",
+    "ambientVolume": 0.35
+  },
+  "icons": [
+    {
+      "id": "memories",
+      "label": "Memories",
+      "emoji": "🌷",
+      "variant": "memories",
+      "windowTitle": "Memory Wall",
+      "content": {
+        "frames": [
+          {
+            "title": "Fuoco",
+            "caption": "Fuoco - you laughed so much that night I forgot the world existed.",
+            "tones": ["#d9c0ff", "#f5d0f5"]
+          },
+          {
+            "title": "Lisbon Rain",
+            "caption": "Lisbon, the rain, your hair dripping sunlight. You were unstoppable.",
+            "tones": ["#b9c9ff", "#e3efff"]
+          },
+          {
+            "title": "Observatory",
+            "caption": "The night sky agreed with me: we were already forever.",
+            "tones": ["#c6b5ff", "#ffd3ee"]
+          },
+          {
+            "title": "Morning Light",
+            "caption": "Your sleepy smile makes ordinary mornings feel cinematic.",
+            "tones": ["#ffe4c4", "#ffd6f2"]
+          },
+          {
+            "title": "Balcony Glow",
+            "caption": "Purple dusk, city hush, your fingers laced with mine.",
+            "tones": ["#b8a7ff", "#f0c9ff"]
+          },
+          {
+            "title": "Cafe Corners",
+            "caption": "You reading, me pretending - just to watch your face soften.",
+            "tones": ["#fbe7d3", "#fde6fa"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "messages",
+      "label": "Messages",
+      "emoji": "💌",
+      "variant": "messages",
+      "windowTitle": "Journal Drafts",
+      "content": {
+        "entries": [
+          "Nov 3 - You're the softness that wears my edges down to something kind.",
+          "Nov 7 - I watch you exist and feel like the world finally makes narrative sense.",
+          "Nov 10 - You're my quiet revolution, my truce with every ache.",
+          "Nov 12 - I hope you never forget this: you are my calm, my ache, my reason."
+        ],
+        "closing": "You're my calm, my ache, my reason. Slayer of my heart, keeper of my peace."
+      }
+    },
+    {
+      "id": "songs",
+      "label": "Songs",
+      "emoji": "🎧",
+      "variant": "songs",
+      "windowTitle": "Cassette Deck",
+      "content": {
+        "description": "Drag a cassette into the deck to play it softly in the background.",
+        "cassettes": [
+          {
+            "id": "first-date",
+            "title": "First Date",
+            "subtitle": "Kaavish - Bachpan",
+            "embedUrl": "https://open.spotify.com/embed/track/18mFSpnzr2UTWyxlL6ZSnM?utm_source=generator",
+            "tone": "#f6d4ff"
+          },
+          {
+            "id": "november-nights",
+            "title": "November Nights",
+            "subtitle": "lofi - dreamy hushed rain",
+            "embedUrl": "https://open.spotify.com/embed/track/1jW4OMHvk5B69MsQACuoAO?utm_source=generator",
+            "tone": "#d5dcff"
+          },
+          {
+            "id": "her-smile",
+            "title": "Her Smile",
+            "subtitle": "Tamasha OST - Heer Toh Badi Sad Hai",
+            "embedUrl": "https://open.spotify.com/embed/track/0HLc7wky0ksP0Yau4ZwFC9?utm_source=generator",
+            "tone": "#ffe7c9"
+          },
+          {
+            "id": "tamasha",
+            "title": "Tamasha",
+            "subtitle": "Tomorrow's lullaby mix",
+            "embedUrl": "https://open.spotify.com/embed/track/4F6HyR1GMXxUOfIanFkFJx?utm_source=generator",
+            "tone": "#f4cde1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "moments",
+      "label": "Moments",
+      "emoji": "📸",
+      "variant": "moments",
+      "windowTitle": "Favorites Shelf",
+      "content": {
+        "items": [
+          {
+            "id": "donut",
+            "label": "OD's Donut",
+            "message": "Because even your ordinary days deserve sweetness.",
+            "tone": "#ffe1c6"
+          },
+          {
+            "id": "perfume",
+            "label": "YSL Libre",
+            "message": "Your signature in the air long after you've left the room.",
+            "tone": "#d4c8ff"
+          },
+          {
+            "id": "airwrap",
+            "label": "Dyson Airwrap",
+            "message": "For every soft wave you never needed to impress me with.",
+            "tone": "#d8f7ff"
+          },
+          {
+            "id": "flowers",
+            "label": "Tulips & Sunflowers",
+            "message": "A vase of the colors you carry in your heart.",
+            "tone": "#ffe7f1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "birthday",
+      "label": "15 Nov 2000",
+      "emoji": "🎂",
+      "variant": "birthday",
+      "windowTitle": "Birthday Ritual",
+      "content": {
+        "message": "Happy birthday, my love. I know this day weighs heavy, but if you could see yourself through my eyes, you'd never doubt how loved you are.",
+        "prompt": "Light the candle to read the rest.",
+        "afterglow": "Stay. Let the night sky hold you while I do the same."
+      }
+    },
+    {
+      "id": "for-you",
+      "label": "For You",
+      "emoji": "🕊️",
+      "variant": "forYou",
+      "windowTitle": "Balcony Whisper",
+      "content": {
+        "message": "Everything beautiful I've ever seen reminds me of you.",
+        "closing": "From Waleed - always."
+      }
+    }
+  ]
+}

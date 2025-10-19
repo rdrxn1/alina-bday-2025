@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'VT323', monospace;
+  color-scheme: dark;
+}
+
+body {
+  @apply min-h-screen text-white;
+  background-color: #0d0b25;
+}
+
+::selection {
+  background-color: rgba(255, 214, 127, 0.35);
+  color: #ffe3a0;
+}
