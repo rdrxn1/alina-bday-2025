@@ -1,4 +1,9 @@
-import { useCallback, useState, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import letDownSrc from '../assets/music/Let Down.mp3'
+import bachpanSrc from '../assets/music/Bachpan.mp3'
+import noSurprisesSrc from '../assets/music/No Surprises.mp3'
+import nindiyaReSrc from '../assets/music/Nindiya Re Studio Version.mp3'
+import baatUnkahiSrc from '../assets/music/Baat Unkahi.mp3'
 
 const PALETTE = Object.freeze({
   bg: '#ffe6f2',
@@ -142,6 +147,243 @@ const ICON_STYLES = Object.freeze({
   },
 })
 
+const TRACKS = Object.freeze([
+  {
+    id: 'let-down',
+    title: 'Let Down',
+    artist: 'Radiohead',
+    src: letDownSrc,
+    display: 'Let Down - Radiohead',
+  },
+  {
+    id: 'bachpan',
+    title: 'Bachpan',
+    artist: 'Kaavish',
+    src: bachpanSrc,
+    display: 'Bachpan - Kaavish',
+  },
+  {
+    id: 'no-surprises',
+    title: 'No Surprises',
+    artist: 'Radiohead',
+    src: noSurprisesSrc,
+    display: 'No Surprises - Radiohead',
+  },
+  {
+    id: 'nindiya-re',
+    title: 'Nindiya Re (Studio)',
+    artist: 'Kaavish',
+    src: nindiyaReSrc,
+    display: 'Nindiya Re (Studio Version) - Kaavish',
+  },
+  {
+    id: 'baat-unkahi',
+    title: 'Baat Unkahi',
+    artist: 'Kaavish',
+    src: baatUnkahiSrc,
+    display: 'Baat Unkahi - Kaavish',
+  },
+])
+
+const formatTime = (value) => {
+  if (!Number.isFinite(value) || value < 0) return '0:00'
+  const minutes = Math.floor(value / 60)
+  const seconds = Math.floor(value % 60)
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+function useDesktopMusicPlayer(tracks) {
+  const audioRef = useRef(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false)
+
+  const currentTrack = tracks[currentIndex]
+
+  const safePlay = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return Promise.resolve(false)
+
+    try {
+      const playPromise = audio.play()
+      if (playPromise && typeof playPromise.then === 'function') {
+        return playPromise
+          .then(() => {
+            setIsPlaying(true)
+            setAutoplayBlocked(false)
+            return true
+          })
+          .catch(() => {
+            setIsPlaying(false)
+            setAutoplayBlocked(true)
+            return false
+          })
+      }
+      setIsPlaying(!audio.paused)
+      setAutoplayBlocked(false)
+      return Promise.resolve(true)
+    } catch (error) {
+      setIsPlaying(false)
+      setAutoplayBlocked(true)
+      return Promise.resolve(false)
+    }
+  }, [])
+
+  const pause = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.pause()
+  }, [])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return undefined
+
+    const handleLoaded = () => {
+      setDuration(audio.duration || 0)
+    }
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime || 0)
+    }
+
+    const handlePlayEvent = () => {
+      setIsPlaying(true)
+      setAutoplayBlocked(false)
+    }
+
+    const handlePauseEvent = () => {
+      setIsPlaying(false)
+    }
+
+    const handleEndedEvent = () => {
+      setCurrentTime(0)
+      setIsPlaying(false)
+      setCurrentIndex(prev => (prev + 1) % tracks.length)
+    }
+
+    audio.addEventListener('loadedmetadata', handleLoaded)
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+    audio.addEventListener('play', handlePlayEvent)
+    audio.addEventListener('pause', handlePauseEvent)
+    audio.addEventListener('ended', handleEndedEvent)
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoaded)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+      audio.removeEventListener('play', handlePlayEvent)
+      audio.removeEventListener('pause', handlePauseEvent)
+      audio.removeEventListener('ended', handleEndedEvent)
+    }
+  }, [tracks.length])
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !currentTrack) return undefined
+
+    audio.pause()
+    audio.currentTime = 0
+    setCurrentTime(0)
+    setDuration(0)
+    audio.volume = 0.75
+
+    const handleLoaded = () => {
+      setDuration(audio.duration || 0)
+      safePlay()
+    }
+
+    audio.addEventListener('loadedmetadata', handleLoaded)
+    try {
+      audio.load()
+    } catch (error) {
+      // Ignore load errors for browsers that don't require it.
+    }
+
+    if (audio.readyState >= 1) {
+      handleLoaded()
+    }
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoaded)
+    }
+  }, [currentTrack, safePlay])
+
+  const seekTo = useCallback((fraction) => {
+    const audio = audioRef.current
+    if (!audio) return
+    const clamped = Math.min(Math.max(fraction, 0), 1)
+    const targetDuration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : duration
+    if (!targetDuration || !Number.isFinite(targetDuration)) return
+    audio.currentTime = clamped * targetDuration
+    setCurrentTime(audio.currentTime || 0)
+  }, [duration])
+
+  const selectTrack = useCallback((index) => {
+    if (index < 0 || index >= tracks.length) return
+    setCurrentIndex(prev => {
+      if (index === prev) {
+        const audio = audioRef.current
+        if (!audio) return prev
+        audio.currentTime = 0
+        setCurrentTime(0)
+        safePlay()
+        return prev
+      }
+      return index
+    })
+  }, [safePlay, tracks.length])
+
+  const next = useCallback(() => {
+    setCurrentIndex(prev => (prev + 1) % tracks.length)
+  }, [tracks.length])
+
+  const prev = useCallback(() => {
+    setCurrentIndex(prev => (prev - 1 + tracks.length) % tracks.length)
+  }, [tracks.length])
+
+  const togglePlay = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (audio.paused) {
+      safePlay()
+    } else {
+      pause()
+    }
+  }, [pause, safePlay])
+
+  const stop = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.pause()
+    audio.currentTime = 0
+    setCurrentTime(0)
+    setIsPlaying(false)
+    setAutoplayBlocked(false)
+  }, [])
+
+  const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0
+
+  return {
+    audioRef,
+    currentTrack,
+    currentIndex,
+    isPlaying,
+    autoplayBlocked,
+    currentTime,
+    duration,
+    progressPercent,
+    selectTrack,
+    next,
+    prev,
+    togglePlay,
+    seekTo,
+    stop,
+    safePlay,
+  }
+}
+
 const INITIAL_WINDOWS = {
   music: { x: 90, y: 70, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
   chat: { x: 410, y: 90, width: 340, height: 320, zIndex: 2, status: 'open', maximized: false },
@@ -155,6 +397,8 @@ function Y2KBirthdayDesktop() {
   const [resizeState, setResizeState] = useState(null)
   const [startOpen, setStartOpen] = useState(false)
   const containerRef = useRef(null)
+  const musicPlayer = useDesktopMusicPlayer(TRACKS)
+  const { stop: stopMusic } = musicPlayer
 
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
@@ -283,7 +527,10 @@ function Y2KBirthdayDesktop() {
 
   const handleClose = useCallback((key) => {
     setWindows(prev => ({ ...prev, [key]: { ...prev[key], status: 'closed' } }))
-  }, [])
+    if (key === 'music') {
+      stopMusic()
+    }
+  }, [stopMusic])
 
   const handleRestore = useCallback((key) => {
     setStartOpen(false)
@@ -377,7 +624,7 @@ function Y2KBirthdayDesktop() {
             onMaximize={handleMaximize}
             onClose={handleClose}
           >
-            <MusicContent />
+            <MusicContent player={musicPlayer} />
           </Window>
         )}
 
@@ -411,6 +658,13 @@ function Y2KBirthdayDesktop() {
           </Window>
         )}
 
+        <audio
+          ref={musicPlayer.audioRef}
+          src={musicPlayer.currentTrack?.src}
+          preload="metadata"
+          className="hidden"
+        />
+
         <Taskbar
           minimizedWindows={minimizedWindows}
           closedWindows={closedWindows}
@@ -418,6 +672,8 @@ function Y2KBirthdayDesktop() {
           onRestore={handleRestore}
           startOpen={startOpen}
           onToggleStart={() => setStartOpen(p => !p)}
+          musicPlayer={musicPlayer}
+          musicWindowStatus={windows.music.status}
         />
       </div>
     </>
@@ -555,42 +811,187 @@ function ChatContent() {
   )
 }
 
-function MusicContent() {
-  return (
-    <div className="p-4 space-y-4">
+function MusicContent({ player }) {
+  if (!player || !player.currentTrack) {
+    return (
       <div
-        className="p-4 text-center"
+        className="flex h-full items-center justify-center p-4 text-sm font-semibold"
+        style={{ color: PALETTE.text }}
+      >
+        Audio unavailable.
+      </div>
+    )
+  }
+
+  const {
+    currentTrack,
+    progressPercent,
+    currentTime,
+    duration,
+    isPlaying,
+    autoplayBlocked,
+    togglePlay,
+    next,
+    prev,
+    selectTrack,
+    seekTo,
+    currentIndex,
+  } = player
+
+  const handleSeek = (event) => {
+    if (!duration) return
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const offset = event.clientX - bounds.left
+    const percent = Math.min(Math.max(offset / bounds.width, 0), 1)
+    seekTo(percent)
+  }
+
+  return (
+    <div className="flex h-full flex-col gap-4 p-4">
+      <div
+        className="space-y-3 rounded-xl border-2 p-4 shadow-[0_18px_40px_rgba(124,210,255,0.2)]"
         style={{
-          border: `2px solid ${PALETTE.secondary}`,
+          borderColor: PALETTE.secondary,
           backgroundColor: '#e8f7ff',
         }}
       >
-        <div className="text-sm font-bold mb-2 tracking-widest" style={{ color: PALETTE.text }}>
+        <div className="text-sm font-bold tracking-[0.35em]" style={{ color: PALETTE.text }}>
           NOW PLAYING
         </div>
-        <div className="text-sm mb-3 font-mono" style={{ color: PALETTE.textLight }}>
-          Kaavish - Bachpan
+        <div
+          className="rounded-lg border-2 px-3 py-2 text-sm font-mono"
+          style={{
+            backgroundColor: '#bfe9ff',
+            borderColor: PALETTE.secondary,
+            color: PALETTE.text,
+          }}
+        >
+          {currentTrack.display}
         </div>
-        <div className="h-12 flex items-center justify-center" style={{ backgroundColor: '#bfe9ff' }}>
-          <svg className="w-full h-10" viewBox="0 0 200 40">
-            <path d="M10,20 L30,10 L50,25 L70,15 L90,22 L110,18 L130,24 L150,20 L170,16 L190,20"
-              stroke={PALETTE.secondary} strokeWidth="2" fill="none" />
-          </svg>
-        </div>
-      </div>
-      <div className="flex justify-center gap-3">
-        {['⏮', '⏯', '⏭'].map(btn => (
-          <button
-            key={btn}
-            className="w-12 h-10 border-2 text-sm font-bold transition-opacity hover:opacity-80"
+        <div className="space-y-2">
+          <div
+            className="relative h-3 w-full cursor-pointer overflow-hidden rounded-full border-2"
             style={{
-              backgroundColor: PALETTE.secondary,
+              borderColor: PALETTE.secondary,
+              backgroundColor: '#cfefff',
+            }}
+            onClick={handleSeek}
+          >
+            <div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                width: `${progressPercent}%`,
+                background: `linear-gradient(90deg, ${PALETTE.secondary}, ${PALETTE.accent})`,
+              }}
+            />
+          </div>
+          <div className="flex justify-between text-xs font-semibold" style={{ color: PALETTE.textLight }}>
+            <span>{formatTime(currentTime)}</span>
+            <span>{duration ? formatTime(duration) : '--:--'}</span>
+          </div>
+        </div>
+        {autoplayBlocked && (
+          <div
+            className="rounded-md border-2 px-3 py-2 text-xs font-semibold"
+            style={{
               borderColor: PALETTE.border,
+              backgroundColor: '#fff1f8',
+              color: PALETTE.text,
             }}
           >
-            {btn}
-          </button>
-        ))}
+            Press play to start "Let Down" - some browsers block autoplay without interaction.
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center justify-center gap-3">
+        <button
+          type="button"
+          className="h-10 w-12 border-2 text-sm font-bold transition-opacity hover:opacity-80"
+          style={{
+            backgroundColor: PALETTE.secondary,
+            borderColor: PALETTE.border,
+            color: PALETTE.text,
+          }}
+          onClick={prev}
+        >
+          ⏮
+        </button>
+        <button
+          type="button"
+          className="h-12 w-14 border-2 text-base font-bold transition-transform hover:scale-[1.03] hover:opacity-90"
+          style={{
+            backgroundColor: PALETTE.accent,
+            borderColor: PALETTE.border,
+            color: PALETTE.text,
+          }}
+          onClick={togglePlay}
+        >
+          {isPlaying ? '⏸' : '⏵'}
+        </button>
+        <button
+          type="button"
+          className="h-10 w-12 border-2 text-sm font-bold transition-opacity hover:opacity-80"
+          style={{
+            backgroundColor: PALETTE.secondary,
+            borderColor: PALETTE.border,
+            color: PALETTE.text,
+          }}
+          onClick={next}
+        >
+          ⏭
+        </button>
+      </div>
+
+      <div
+        className="flex-1 space-y-2 overflow-y-auto rounded-xl border-2 p-3 custom-scroll"
+        style={{
+          borderColor: PALETTE.secondary,
+          backgroundColor: '#f0fbff',
+          color: PALETTE.text,
+        }}
+      >
+        <div className="text-xs font-bold tracking-widest" style={{ color: PALETTE.textLight }}>
+          PLAYLIST
+        </div>
+        <div className="space-y-2">
+          {TRACKS.map((track, index) => {
+            const isCurrent = index === currentIndex
+            return (
+              <button
+                key={track.id}
+                type="button"
+                className="flex w-full items-center justify-between gap-3 rounded-lg border-2 px-3 py-2 text-left text-xs font-semibold transition-transform hover:translate-x-[2px] hover:opacity-90"
+                style={{
+                  borderColor: isCurrent ? PALETTE.secondary : PALETTE.border,
+                  backgroundColor: isCurrent ? '#d9f3ff' : '#ffffff',
+                  color: PALETTE.text,
+                  boxShadow: isCurrent ? '0 8px 20px rgba(124, 210, 255, 0.25)' : 'none',
+                }}
+                onClick={() => selectTrack(index)}
+              >
+                <span className="flex items-center gap-2">
+                  <span
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full border text-[10px]"
+                    style={{
+                      borderColor: isCurrent ? PALETTE.secondary : PALETTE.border,
+                      backgroundColor: isCurrent ? PALETTE.secondary : '#fdfbfe',
+                      color: PALETTE.text,
+                    }}
+                  >
+                    {isCurrent && isPlaying ? '♪' : index + 1}
+                  </span>
+                  <span>{track.display}</span>
+                </span>
+                {isCurrent && (
+                  <span className="text-[10px] uppercase tracking-widest" style={{ color: PALETTE.textLight }}>
+                    {isPlaying ? 'PLAYING' : 'PAUSED'}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
@@ -736,7 +1137,7 @@ function FloatingShapes() {
   )
 }
 
-function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, startOpen, onToggleStart }) {
+function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, startOpen, onToggleStart, musicPlayer, musicWindowStatus }) {
   return (
     <div
       className="absolute bottom-0 left-0 right-0 flex h-14 items-center gap-3 px-4 text-sm"
@@ -806,21 +1207,37 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
       </div>
 
       <div className="flex flex-1 gap-2">
-        {minimizedWindows.map(key => (
-          <button
-            key={key}
-            className="px-4 py-2 text-xs font-bold tracking-wide uppercase border-2 transition-transform transform hover:-translate-y-0.5 transition-opacity hover:opacity-90"
-            style={{
-              backgroundColor: windowInfo[key].colors.titleBar,
-              borderColor: windowInfo[key].colors.border,
-              color: PALETTE.text,
-              boxShadow: '0 6px 18px rgba(0,0,0,0.1)',
-            }}
-            onClick={() => onRestore(key)}
-          >
-            {windowInfo[key].taskLabel}
-          </button>
-        ))}
+        {minimizedWindows.map(key => {
+          const info = windowInfo[key]
+          if (!info) return null
+
+          if (key === 'music' && musicPlayer && musicWindowStatus === 'minimized') {
+            return (
+              <MiniMusicControls
+                key={key}
+                player={musicPlayer}
+                palette={info.colors}
+                onRestore={() => onRestore(key)}
+              />
+            )
+          }
+
+          return (
+            <button
+              key={key}
+              className="px-4 py-2 text-xs font-bold uppercase tracking-wide border-2 transform transition-transform hover:-translate-y-0.5 transition-opacity hover:opacity-90"
+              style={{
+                backgroundColor: info.colors.titleBar,
+                borderColor: info.colors.border,
+                color: PALETTE.text,
+                boxShadow: '0 6px 18px rgba(0,0,0,0.1)',
+              }}
+              onClick={() => onRestore(key)}
+            >
+              {info.taskLabel}
+            </button>
+          )
+        })}
       </div>
 
       <div
@@ -832,6 +1249,109 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
         }}
       >
         12:34 AM
+      </div>
+    </div>
+  )
+}
+
+function MiniMusicControls({ player, palette, onRestore }) {
+  const trackLabel = player.currentTrack?.display ?? 'Unknown Track'
+  const progressWidth = Math.min(100, Math.max(0, player.progressPercent ?? 0))
+
+  return (
+    <div
+      className="flex items-center gap-3 rounded-lg border-2 px-3 py-2 text-xs"
+      style={{
+        backgroundColor: palette.background,
+        borderColor: palette.border,
+        color: PALETTE.text,
+        boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
+      }}
+    >
+      <div className="flex min-w-[160px] flex-col gap-1">
+        <span
+          className="text-[10px] font-bold uppercase tracking-[0.35em]"
+          style={{ color: PALETTE.textLight }}
+        >
+          Now Playing
+        </span>
+        <span className="text-xs font-mono leading-tight" title={trackLabel}>
+          {trackLabel}
+        </span>
+        <div className="flex items-center gap-2">
+          <div
+            className="relative h-1.5 flex-1 overflow-hidden rounded-full border"
+            style={{
+              borderColor: palette.border,
+              backgroundColor: '#ffffff',
+            }}
+          >
+            <div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                width: `${progressWidth}%`,
+                background: `linear-gradient(90deg, ${palette.titleBar}, ${PALETTE.accent})`,
+              }}
+            />
+          </div>
+          <span
+            className="text-[10px] font-semibold"
+            style={{ color: PALETTE.textLight }}
+          >
+            {formatTime(player.currentTime)} / {player.duration ? formatTime(player.duration) : '--:--'}
+          </span>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          className="h-8 w-8 border-2 font-bold transition-opacity hover:opacity-80"
+          style={{
+            backgroundColor: palette.titleBar,
+            borderColor: palette.border,
+            color: PALETTE.text,
+          }}
+          onClick={player.prev}
+        >
+          ⏮
+        </button>
+        <button
+          type="button"
+          className="h-9 w-9 border-2 text-sm font-bold transition-opacity hover:opacity-85"
+          style={{
+            backgroundColor: PALETTE.accent,
+            borderColor: palette.border,
+            color: PALETTE.text,
+          }}
+          onClick={player.togglePlay}
+        >
+          {player.isPlaying ? '⏸' : '⏵'}
+        </button>
+        <button
+          type="button"
+          className="h-8 w-8 border-2 font-bold transition-opacity hover:opacity-80"
+          style={{
+            backgroundColor: palette.titleBar,
+            borderColor: palette.border,
+            color: PALETTE.text,
+          }}
+          onClick={player.next}
+        >
+          ⏭
+        </button>
+        <button
+          type="button"
+          className="h-8 w-8 border-2 text-sm font-bold transition-opacity hover:opacity-80"
+          style={{
+            backgroundColor: '#ffffff',
+            borderColor: palette.border,
+            color: PALETTE.text,
+          }}
+          onClick={onRestore}
+          title="Restore player"
+        >
+          ▣
+        </button>
       </div>
     </div>
   )
