@@ -65,7 +65,7 @@ export default function AlinaOSBoot({ onEnter }) {
           position: relative;
           width: 100vw;
           height: 100vh;
-          background: linear-gradient(135deg, #1a0a1f 0%, #2d1b3d 50%, #1a0a1f 100%);
+          background: linear-gradient(135deg, #2a1a2e 0%, #3d2842 50%, #2a1a2e 100%);
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -148,7 +148,7 @@ export default function AlinaOSBoot({ onEnter }) {
           position: relative;
           z-index: 10;
           width: 90%;
-          max-width: 850px;
+          max-width: 650px;
           opacity: 0;
           transform: scale(0.95) translateY(20px);
           transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -162,8 +162,8 @@ export default function AlinaOSBoot({ onEnter }) {
         /* OS Window */
         .os-window {
           border: 5px solid #ff9fcf;
-          padding: 2.5rem 3.5rem;
-          background: linear-gradient(135deg, rgba(26, 10, 31, 0.95) 0%, rgba(45, 27, 61, 0.95) 100%);
+          padding: 2rem 2.5rem;
+          background: linear-gradient(135deg, rgba(42, 26, 46, 0.95) 0%, rgba(61, 40, 66, 0.95) 100%);
           box-shadow:
             0 0 0 2px #ffc6df,
             0 0 30px rgba(255, 159, 207, 0.4),
@@ -186,7 +186,7 @@ export default function AlinaOSBoot({ onEnter }) {
         /* Glowing logo */
         .logo {
           font-family: 'Press Start 2P', cursive;
-          font-size: 4.5rem;
+          font-size: 3.5rem;
           color: #ff9fcf;
           text-align: center;
           margin-bottom: 0.5rem;
@@ -218,20 +218,20 @@ export default function AlinaOSBoot({ onEnter }) {
         }
 
         .version {
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           color: #ffc6df;
           text-align: center;
-          margin-bottom: 2.5rem;
+          margin-bottom: 2rem;
           letter-spacing: 0.2em;
           text-shadow: 0 0 10px rgba(255, 198, 223, 0.6);
         }
 
         /* Boot sequence messages */
         .boot-text {
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           color: #ffe0ec;
-          line-height: 2.2;
-          margin-bottom: 2rem;
+          line-height: 2;
+          margin-bottom: 1.5rem;
           text-shadow: 0 0 8px rgba(255, 224, 236, 0.4);
         }
 
