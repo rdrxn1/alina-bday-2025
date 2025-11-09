@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 export default function AlinaOSBoot({ onEnter }) {
-  const [fadeOut, setFadeOut] = useState(false);
-
   const enterSystem = useCallback(() => {
-    setFadeOut(true);
-    setTimeout(() => {
-      if (typeof onEnter === 'function') {
-        onEnter();
-      }
-    }, 600);
+    if (typeof onEnter === 'function') {
+      onEnter();
+    }
   }, [onEnter]);
 
   useEffect(() => {
@@ -88,10 +83,25 @@ export default function AlinaOSBoot({ onEnter }) {
         .logo {
           font-family: 'VT323', monospace;
           font-size: 8rem;
-          font-weight: 400;
-          letter-spacing: 0.05em;
+          font-weight: 700;
+          letter-spacing: 0.15em;
           line-height: 1;
           position: relative;
+          transform: scaleX(1.3);
+          opacity: 0;
+          animation: fadeInUp 0.8s ease-out forwards;
+          animation-delay: 0.2s;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: scaleX(1.3) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: scaleX(1.3) translateY(0);
+          }
         }
 
         .logo-white {
@@ -114,6 +124,18 @@ export default function AlinaOSBoot({ onEnter }) {
           color: #ff9fcf;
           letter-spacing: 0.1em;
           margin-top: -2rem;
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 0.6s;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         .boot-messages {
@@ -125,11 +147,37 @@ export default function AlinaOSBoot({ onEnter }) {
           color: #8a6ba0;
         }
 
+        .boot-messages div {
+          opacity: 0;
+          transform: translateX(-20px);
+          animation: slideIn 0.5s ease-out forwards;
+        }
+
+        .boot-messages div:nth-child(1) { animation-delay: 1.0s; }
+        .boot-messages div:nth-child(2) { animation-delay: 1.2s; }
+        .boot-messages div:nth-child(3) { animation-delay: 1.4s; }
+        .boot-messages div:nth-child(4) { animation-delay: 1.6s; }
+        .boot-messages div:nth-child(5) { animation-delay: 1.8s; }
+
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
         .divider {
           width: 100%;
           max-width: 400px;
           height: 3px;
           background: #ff9fcf;
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 2.2s;
         }
 
         .prompt-section {
@@ -144,12 +192,18 @@ export default function AlinaOSBoot({ onEnter }) {
           font-size: 1.8rem;
           color: #8a6ba0;
           font-style: italic;
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 2.6s;
         }
 
         .prompt {
           font-family: 'VT323', monospace;
           font-size: 1.6rem;
           color: #8a6ba0;
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 3.0s;
         }
 
         .cursor {
@@ -175,6 +229,9 @@ export default function AlinaOSBoot({ onEnter }) {
           box-shadow:
             0 4px 0 #ff85bb,
             0 8px 16px rgba(255, 159, 207, 0.3);
+          opacity: 0;
+          animation: fadeIn 0.6s ease-out forwards;
+          animation-delay: 3.4s;
         }
 
         .enter-btn:hover {
@@ -191,21 +248,22 @@ export default function AlinaOSBoot({ onEnter }) {
             0 4px 12px rgba(255, 159, 207, 0.3);
         }
 
-        /* Fade out */
-        .fade-out {
-          animation: fadeOut 0.6s forwards;
-        }
-
-        @keyframes fadeOut {
-          to {
-            opacity: 0;
-          }
-        }
 
         /* Responsive */
         @media (max-width: 900px) {
           .logo {
             font-size: 5rem;
+          }
+
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: scaleX(1.3) translateY(15px);
+            }
+            to {
+              opacity: 1;
+              transform: scaleX(1.3) translateY(0);
+            }
           }
 
           .logo-pink {
@@ -313,14 +371,14 @@ export default function AlinaOSBoot({ onEnter }) {
         }
       `}</style>
 
-      <div className={`boot-container ${fadeOut ? 'fade-out' : ''}`}>
+      <div className="boot-container">
         <div className="content">
           <div className="logo-container">
             <div className="logo logo-pink">AlinaOS</div>
             <div className="logo logo-white">AlinaOS</div>
           </div>
 
-          <div className="version">v25.0 ★ BIRTHDAY EDITION</div>
+          <div className="version">v25.0</div>
 
           <div className="boot-messages">
             <div>&gt; INITIALIZING BIRTHDAY SYSTEM...</div>
