@@ -567,7 +567,7 @@ export default function AlinaOSBoot({ onEnter }) {
             <div className="divider"></div>
 
             <div className="prompt-section">
-              <div className="ready">READY PLAYER ONE</div>
+              <div className="ready">SYSTEM READY</div>
               <div className="tagline">A lavender night made just for you</div>
               <div className="prompt">
                 PRESS ENTER TO CONTINUE<span className="cursor">_</span>
