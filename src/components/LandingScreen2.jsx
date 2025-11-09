@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 export default function AlinaOSBoot({ onEnter }) {
   const [fadeOut, setFadeOut] = useState(false);
   const [particles, setParticles] = useState([]);
-  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+  const [bootStage, setBootStage] = useState(0);
 
   const enterSystem = useCallback(() => {
     setFadeOut(true);
@@ -13,27 +13,44 @@ export default function AlinaOSBoot({ onEnter }) {
       } else {
         console.log('System entered - navigation handler not provided');
       }
-    }, 600);
+    }, 800);
   }, [onEnter]);
 
   useEffect(() => {
-    // Trigger entrance animation
-    setTimeout(() => setHasAnimatedIn(true), 100);
-
     // Generate floating pixel particles
-    const newParticles = Array.from({ length: 25 }, (_, i) => ({
+    const newParticles = Array.from({ length: 20 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
       top: Math.random() * 100,
-      size: Math.random() * 12 + 6,
-      animationDuration: Math.random() * 4 + 3,
-      animationDelay: Math.random() * 2,
+      size: Math.random() * 10 + 5,
+      animationDuration: Math.random() * 5 + 4,
+      animationDelay: Math.random() * 3,
       color: ['#ffc6df', '#ff9fcf', '#ffe0ec', '#ffb6d9'][Math.floor(Math.random() * 4)]
     }));
     setParticles(newParticles);
 
+    // Staggered boot sequence
+    const timings = [
+      { stage: 1, delay: 500 },    // Logo
+      { stage: 2, delay: 1200 },   // Version
+      { stage: 3, delay: 1800 },   // First boot message
+      { stage: 4, delay: 2600 },   // Second boot message
+      { stage: 5, delay: 3400 },   // Third boot message
+      { stage: 6, delay: 4200 },   // Fourth boot message
+      { stage: 7, delay: 5000 },   // Fifth boot message
+      { stage: 8, delay: 5800 },   // Divider
+      { stage: 9, delay: 6400 },   // System ready text
+      { stage: 10, delay: 7000 },  // Tagline
+      { stage: 11, delay: 7500 },  // Prompt
+      { stage: 12, delay: 8000 },  // Button
+    ];
+
+    const timeouts = timings.map(({ stage, delay }) =>
+      setTimeout(() => setBootStage(stage), delay)
+    );
+
     const handleKeyPress = (event) => {
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && bootStage >= 12) {
         enterSystem();
       }
     };
@@ -41,9 +58,10 @@ export default function AlinaOSBoot({ onEnter }) {
     document.addEventListener('keydown', handleKeyPress);
 
     return () => {
+      timeouts.forEach(clearTimeout);
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [enterSystem]);
+  }, [enterSystem, bootStage]);
 
   return (
     <>
@@ -65,7 +83,7 @@ export default function AlinaOSBoot({ onEnter }) {
           position: relative;
           width: 100vw;
           height: 100vh;
-          background: linear-gradient(135deg, #2a1a2e 0%, #3d2842 50%, #2a1a2e 100%);
+          background: linear-gradient(135deg, #ffe6f2 0%, #ffd8e9 50%, #ffe6f2 100%);
           overflow: hidden;
           display: flex;
           align-items: center;
@@ -80,15 +98,15 @@ export default function AlinaOSBoot({ onEnter }) {
           left: 0;
           right: 0;
           bottom: 0;
-          background: radial-gradient(ellipse at center, rgba(255, 150, 207, 0.15) 0%, transparent 70%);
-          animation: pulseGlow 4s ease-in-out infinite;
+          background: radial-gradient(ellipse at center, rgba(255, 159, 207, 0.1) 0%, transparent 70%);
+          animation: pulseGlow 6s ease-in-out infinite;
           pointer-events: none;
           z-index: 1;
         }
 
         @keyframes pulseGlow {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.05); }
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.02); }
         }
 
         /* Retro scanlines */
@@ -100,14 +118,14 @@ export default function AlinaOSBoot({ onEnter }) {
           height: 100%;
           background: repeating-linear-gradient(
             0deg,
-            rgba(255, 255, 255, 0.03) 0px,
+            rgba(0, 0, 0, 0.02) 0px,
             transparent 2px,
             transparent 4px,
-            rgba(255, 255, 255, 0.03) 6px
+            rgba(0, 0, 0, 0.02) 6px
           );
           pointer-events: none;
           z-index: 100;
-          animation: scanlineMove 8s linear infinite;
+          animation: scanlineMove 10s linear infinite;
         }
 
         @keyframes scanlineMove {
@@ -128,18 +146,18 @@ export default function AlinaOSBoot({ onEnter }) {
         .particle {
           position: absolute;
           animation: pixelFloat ease-in-out infinite;
-          opacity: 0.4;
-          box-shadow: 0 0 8px currentColor;
+          opacity: 0.3;
+          border-radius: 2px;
         }
 
         @keyframes pixelFloat {
           0%, 100% {
-            transform: translateY(0) translateX(0) rotate(0deg);
+            transform: translateY(0) translateX(0);
             opacity: 0.2;
           }
           50% {
-            transform: translateY(-30px) translateX(10px) rotate(180deg);
-            opacity: 0.6;
+            transform: translateY(-25px) translateX(8px);
+            opacity: 0.4;
           }
         }
 
@@ -149,27 +167,18 @@ export default function AlinaOSBoot({ onEnter }) {
           z-index: 10;
           width: 90%;
           max-width: 650px;
-          opacity: 0;
-          transform: scale(0.95) translateY(20px);
-          transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .content.animate-in {
-          opacity: 1;
-          transform: scale(1) translateY(0);
         }
 
         /* OS Window */
         .os-window {
-          border: 5px solid #ff9fcf;
+          border: 4px solid #ff9fcf;
           padding: 2rem 2.5rem;
-          background: linear-gradient(135deg, rgba(42, 26, 46, 0.95) 0%, rgba(61, 40, 66, 0.95) 100%);
+          background: rgba(255, 245, 249, 0.95);
           box-shadow:
             0 0 0 2px #ffc6df,
-            0 0 30px rgba(255, 159, 207, 0.4),
-            inset 0 0 60px rgba(255, 182, 217, 0.1);
+            0 8px 32px rgba(255, 159, 207, 0.3);
           position: relative;
-          backdrop-filter: blur(10px);
+          backdrop-filter: blur(8px);
         }
 
         .os-window::before {
@@ -178,95 +187,74 @@ export default function AlinaOSBoot({ onEnter }) {
           top: 0;
           left: 0;
           right: 0;
-          height: 40px;
-          background: linear-gradient(180deg, rgba(255, 159, 207, 0.2) 0%, transparent 100%);
-          border-bottom: 2px solid rgba(255, 159, 207, 0.3);
+          height: 32px;
+          background: linear-gradient(180deg, rgba(255, 159, 207, 0.15) 0%, transparent 100%);
+          border-bottom: 2px solid rgba(255, 159, 207, 0.2);
         }
 
-        /* Glowing logo */
+        /* Logo with pixel font */
         .logo {
           font-family: 'Press Start 2P', cursive;
-          font-size: 3.5rem;
+          font-size: 3rem;
           color: #ff9fcf;
           text-align: center;
           margin-bottom: 0.5rem;
           letter-spacing: 0.3em;
           text-shadow:
-            0 0 20px rgba(255, 159, 207, 0.8),
-            0 0 40px rgba(255, 159, 207, 0.5),
-            3px 3px 0 #ffc6df,
-            6px 6px 0 rgba(255, 224, 236, 0.5);
-          line-height: 1.3;
-          animation: logoGlow 3s ease-in-out infinite;
+            2px 2px 0 #ffc6df,
+            4px 4px 0 rgba(255, 224, 236, 0.5);
+          line-height: 1.4;
+          opacity: 0;
+          transform: scale(0.9);
+          transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        @keyframes logoGlow {
-          0%, 100% {
-            text-shadow:
-              0 0 20px rgba(255, 159, 207, 0.8),
-              0 0 40px rgba(255, 159, 207, 0.5),
-              3px 3px 0 #ffc6df,
-              6px 6px 0 rgba(255, 224, 236, 0.5);
-          }
-          50% {
-            text-shadow:
-              0 0 30px rgba(255, 159, 207, 1),
-              0 0 60px rgba(255, 159, 207, 0.7),
-              3px 3px 0 #ffc6df,
-              6px 6px 0 rgba(255, 224, 236, 0.7);
-          }
+        .logo.visible {
+          opacity: 1;
+          transform: scale(1);
         }
 
         .version {
-          font-size: 1.5rem;
-          color: #ffc6df;
+          font-family: 'VT323', monospace;
+          font-size: 1.8rem;
+          color: #ff9fcf;
           text-align: center;
           margin-bottom: 2rem;
-          letter-spacing: 0.2em;
-          text-shadow: 0 0 10px rgba(255, 198, 223, 0.6);
+          letter-spacing: 0.1em;
+          opacity: 0;
+          transform: translateY(-10px);
+          transition: all 0.6s ease-out;
+        }
+
+        .version.visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         /* Boot sequence messages */
         .boot-text {
-          font-size: 1.2rem;
-          color: #ffe0ec;
-          line-height: 2;
+          font-family: 'VT323', monospace;
+          font-size: 1.6rem;
+          color: #8a6ba0;
+          line-height: 2.2;
           margin-bottom: 1.5rem;
-          text-shadow: 0 0 8px rgba(255, 224, 236, 0.4);
         }
 
         .boot-text div {
           opacity: 0;
-          transform: translateX(-20px);
-          animation: slideInGlow 0.6s forwards;
+          transform: translateX(-15px);
+          transition: all 0.5s ease-out;
         }
 
-        .boot-text div:nth-child(1) { animation-delay: 0.4s; }
-        .boot-text div:nth-child(2) { animation-delay: 0.7s; }
-        .boot-text div:nth-child(3) { animation-delay: 1.0s; }
-        .boot-text div:nth-child(4) { animation-delay: 1.3s; }
-        .boot-text div:nth-child(5) { animation-delay: 1.6s; }
-
-        @keyframes slideInGlow {
-          0% {
-            opacity: 0;
-            transform: translateX(-20px);
-            text-shadow: 0 0 0 rgba(255, 224, 236, 0);
-          }
-          50% {
-            text-shadow: 0 0 15px rgba(255, 224, 236, 0.8);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0);
-            text-shadow: 0 0 8px rgba(255, 224, 236, 0.4);
-          }
+        .boot-text div.visible {
+          opacity: 1;
+          transform: translateX(0);
         }
 
-        /* Pixel divider */
+        /* Divider */
         .divider {
           width: 100%;
-          height: 4px;
+          height: 3px;
           background: linear-gradient(90deg,
             transparent 0%,
             #ff9fcf 20%,
@@ -274,22 +262,14 @@ export default function AlinaOSBoot({ onEnter }) {
             #ff9fcf 80%,
             transparent 100%);
           margin: 2rem 0;
-          box-shadow: 0 0 10px rgba(255, 159, 207, 0.6);
-          animation: dividerPulse 2s ease-in-out infinite;
           opacity: 0;
-          animation-delay: 1.8s;
-          animation-fill-mode: forwards;
+          transform: scaleX(0);
+          transition: all 0.8s ease-out;
         }
 
-        @keyframes dividerPulse {
-          0%, 100% {
-            opacity: 0.6;
-            box-shadow: 0 0 10px rgba(255, 159, 207, 0.6);
-          }
-          50% {
-            opacity: 1;
-            box-shadow: 0 0 20px rgba(255, 159, 207, 0.9);
-          }
+        .divider.visible {
+          opacity: 1;
+          transform: scaleX(1);
         }
 
         /* Prompt section */
@@ -298,46 +278,55 @@ export default function AlinaOSBoot({ onEnter }) {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 2rem;
-          opacity: 0;
-          animation: fadeInUp 0.8s forwards;
-          animation-delay: 2.0s;
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          gap: 1.5rem;
         }
 
         .ready {
-          font-family: 'Press Start 2P', cursive;
-          font-size: 1.6rem;
+          font-family: 'VT323', monospace;
+          font-size: 2rem;
           color: #ff9fcf;
           text-align: center;
-          letter-spacing: 0.2em;
-          text-shadow: 0 0 15px rgba(255, 159, 207, 0.8);
-          margin-bottom: 0.5rem;
+          letter-spacing: 0.15em;
+          opacity: 0;
+          transform: translateY(15px);
+          transition: all 0.6s ease-out;
+        }
+
+        .ready.visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .tagline {
-          font-size: 1.3rem;
-          color: #ffc6df;
+          font-family: 'VT323', monospace;
+          font-size: 1.5rem;
+          color: #8a6ba0;
           text-align: center;
-          margin-bottom: 1rem;
           font-style: italic;
-          text-shadow: 0 0 10px rgba(255, 198, 223, 0.5);
+          opacity: 0;
+          transform: translateY(15px);
+          transition: all 0.6s ease-out;
+          transition-delay: 0.1s;
+        }
+
+        .tagline.visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .prompt {
-          font-size: 1.2rem;
-          color: #ffe0ec;
-          text-shadow: 0 0 8px rgba(255, 224, 236, 0.6);
+          font-family: 'VT323', monospace;
+          font-size: 1.4rem;
+          color: #8a6ba0;
+          opacity: 0;
+          transform: translateY(15px);
+          transition: all 0.6s ease-out;
+          transition-delay: 0.2s;
+        }
+
+        .prompt.visible {
+          opacity: 1;
+          transform: translateY(0);
         }
 
         .cursor {
@@ -349,67 +338,55 @@ export default function AlinaOSBoot({ onEnter }) {
           51%, 100% { opacity: 0; }
         }
 
-        /* Start button with retro game feel */
+        /* Start button */
         .enter-btn {
-          font-family: 'Press Start 2P', cursive;
-          font-size: 1.4rem;
-          color: #1a0a1f;
+          font-family: 'VT323', monospace;
+          font-size: 1.6rem;
+          color: #5a3d7a;
           background: linear-gradient(180deg, #ffc6df 0%, #ff9fcf 100%);
-          border: 4px solid #ffe0ec;
-          padding: 1rem 3rem;
+          border: 3px solid #ff85bb;
+          padding: 0.8rem 2.5rem;
           cursor: pointer;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
+          letter-spacing: 0.15em;
           transition: all 0.2s;
           box-shadow:
-            0 0 20px rgba(255, 159, 207, 0.6),
-            inset 0 -6px 0 rgba(0, 0, 0, 0.2),
-            0 6px 0 #a84d71,
-            0 10px 20px rgba(0, 0, 0, 0.4);
+            0 4px 0 #ff85bb,
+            0 8px 16px rgba(255, 159, 207, 0.3);
           position: relative;
-          animation: buttonFloat 2s ease-in-out infinite;
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+          transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition-delay: 0.3s;
         }
 
-        @keyframes buttonFloat {
-          0%, 100% {
-            transform: translateY(0);
-            box-shadow:
-              0 0 20px rgba(255, 159, 207, 0.6),
-              inset 0 -6px 0 rgba(0, 0, 0, 0.2),
-              0 6px 0 #a84d71,
-              0 10px 20px rgba(0, 0, 0, 0.4);
-          }
-          50% {
-            transform: translateY(-4px);
-            box-shadow:
-              0 0 30px rgba(255, 159, 207, 0.9),
-              inset 0 -6px 0 rgba(0, 0, 0, 0.2),
-              0 8px 0 #a84d71,
-              0 14px 25px rgba(0, 0, 0, 0.5);
-          }
+        .enter-btn.visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
         }
 
-        .enter-btn:hover {
-          transform: translateY(-3px) scale(1.05);
+        .enter-btn:hover:not(:disabled) {
+          transform: translateY(-2px) scale(1.02);
           box-shadow:
-            0 0 35px rgba(255, 159, 207, 1),
-            inset 0 -6px 0 rgba(0, 0, 0, 0.2),
-            0 8px 0 #a84d71,
-            0 15px 30px rgba(0, 0, 0, 0.5);
+            0 6px 0 #ff85bb,
+            0 12px 20px rgba(255, 159, 207, 0.4);
         }
 
-        .enter-btn:active {
+        .enter-btn:active:not(:disabled) {
           transform: translateY(2px);
           box-shadow:
-            0 0 15px rgba(255, 159, 207, 0.6),
-            inset 0 -3px 0 rgba(0, 0, 0, 0.2),
-            0 3px 0 #a84d71,
-            0 6px 15px rgba(0, 0, 0, 0.3);
+            0 2px 0 #ff85bb,
+            0 4px 12px rgba(255, 159, 207, 0.3);
+        }
+
+        .enter-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         /* Fade out animation */
         .fade-out {
-          animation: zoomFadeOut 0.6s forwards;
+          animation: zoomFadeOut 0.8s forwards;
         }
 
         @keyframes zoomFadeOut {
@@ -420,111 +397,109 @@ export default function AlinaOSBoot({ onEnter }) {
           }
           50% {
             transform: scale(1.05);
-            filter: brightness(1.2);
+            filter: brightness(1.15);
           }
           100% {
             opacity: 0;
-            transform: scale(1.1);
-            filter: brightness(1.5);
+            transform: scale(1.08);
+            filter: brightness(1.3);
           }
         }
 
         /* Responsive Design */
         @media (max-width: 900px) {
           .os-window {
-            padding: 2rem 2.5rem;
+            padding: 1.5rem 2rem;
           }
 
           .logo {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             text-shadow:
-              0 0 15px rgba(255, 159, 207, 0.8),
-              0 0 30px rgba(255, 159, 207, 0.5),
               2px 2px 0 #ffc6df,
-              4px 4px 0 rgba(255, 224, 236, 0.5);
+              3px 3px 0 rgba(255, 224, 236, 0.5);
           }
 
           .version {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
           }
 
           .boot-text {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
           }
 
           .ready {
-            font-size: 1.2rem;
+            font-size: 1.6rem;
           }
 
           .tagline {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
           }
 
           .prompt {
-            font-size: 1rem;
+            font-size: 1.2rem;
           }
 
           .enter-btn {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             width: 100%;
-            padding: 1rem 2rem;
+            padding: 0.8rem 2rem;
           }
         }
 
         @media (max-height: 700px) {
           .os-window {
-            padding: 1.5rem 2.5rem;
+            padding: 1.2rem 2rem;
           }
 
           .logo {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 0.3rem;
           }
 
           .version {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
           }
 
           .boot-text {
-            font-size: 1rem;
+            font-size: 1.2rem;
             line-height: 1.8;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
           }
 
           .divider {
-            margin: 1.5rem 0;
+            margin: 1.2rem 0;
           }
 
           .ready {
-            font-size: 1.1rem;
+            font-size: 1.4rem;
           }
 
           .tagline {
-            font-size: 1rem;
+            font-size: 1.2rem;
           }
 
           .prompt {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
           }
 
           .enter-btn {
-            font-size: 1rem;
-            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
+            padding: 0.7rem 2rem;
           }
 
           .prompt-section {
-            gap: 1.5rem;
+            gap: 1rem;
           }
         }
 
         @media (max-width: 600px) {
           .logo {
-            font-size: 2rem;
+            font-size: 1.8rem;
           }
 
           .enter-btn {
-            font-size: 0.9rem;
+            font-size: 1.1rem;
           }
         }
       `}</style>
@@ -551,29 +526,35 @@ export default function AlinaOSBoot({ onEnter }) {
           ))}
         </div>
 
-        <div className={`content ${hasAnimatedIn ? 'animate-in' : ''} ${fadeOut ? 'fade-out' : ''}`}>
+        <div className={`content ${fadeOut ? 'fade-out' : ''}`}>
           <div className="os-window">
-            <div className="logo">AlinaOS</div>
-            <div className="version">v25.0 ★ BIRTHDAY EDITION</div>
-
-            <div className="boot-text">
-              <div>&gt; INITIALIZING BIRTHDAY SYSTEM...</div>
-              <div>&gt; LOADING SPARKLE MODULES...</div>
-              <div>&gt; CHECKING CELEBRATION LEVELS... OK</div>
-              <div>&gt; PREPARING SPECIAL SURPRISES...</div>
-              <div>&gt; SYSTEM READY FOR FUN!</div>
+            <div className={`logo ${bootStage >= 1 ? 'visible' : ''}`}>AlinaOS</div>
+            <div className={`version ${bootStage >= 2 ? 'visible' : ''}`}>
+              v25.0 ★ BIRTHDAY EDITION
             </div>
 
-            <div className="divider"></div>
+            <div className="boot-text">
+              <div className={bootStage >= 3 ? 'visible' : ''}>&gt; INITIALIZING BIRTHDAY SYSTEM...</div>
+              <div className={bootStage >= 4 ? 'visible' : ''}>&gt; LOADING SPARKLE MODULES...</div>
+              <div className={bootStage >= 5 ? 'visible' : ''}>&gt; CHECKING CELEBRATION LEVELS... OK</div>
+              <div className={bootStage >= 6 ? 'visible' : ''}>&gt; PREPARING SPECIAL SURPRISES...</div>
+              <div className={bootStage >= 7 ? 'visible' : ''}>&gt; SYSTEM READY FOR FUN!</div>
+            </div>
+
+            <div className={`divider ${bootStage >= 8 ? 'visible' : ''}`}></div>
 
             <div className="prompt-section">
-              <div className="ready">SYSTEM READY</div>
-              <div className="tagline">A lavender night made just for you</div>
-              <div className="prompt">
+              <div className={`ready ${bootStage >= 9 ? 'visible' : ''}`}>SYSTEM READY</div>
+              <div className={`tagline ${bootStage >= 10 ? 'visible' : ''}`}>A lavender night made just for you</div>
+              <div className={`prompt ${bootStage >= 11 ? 'visible' : ''}`}>
                 PRESS ENTER TO CONTINUE<span className="cursor">_</span>
               </div>
 
-              <button className="enter-btn" onClick={enterSystem}>
+              <button
+                className={`enter-btn ${bootStage >= 12 ? 'visible' : ''}`}
+                onClick={enterSystem}
+                disabled={bootStage < 12}
+              >
                 START
               </button>
             </div>
