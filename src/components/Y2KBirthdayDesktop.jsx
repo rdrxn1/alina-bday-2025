@@ -194,6 +194,9 @@ const formatTime = (value) => {
 
 function useDesktopMusicPlayer(tracks) {
   const audioRef = useRef(null)
+  const analyserRef = useRef(null)
+  const audioContextRef = useRef(null)
+  const sourceRef = useRef(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
@@ -201,6 +204,39 @@ function useDesktopMusicPlayer(tracks) {
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
 
   const currentTrack = tracks[currentIndex]
+
+  // Set up Web Audio API for visualization
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    // Initialize audio context and analyser on first play
+    const setupAudioContext = () => {
+      if (audioContextRef.current) return // Already set up
+
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        const analyser = audioContext.createAnalyser()
+        analyser.fftSize = 256
+        analyser.smoothingTimeConstant = 0.8
+
+        const source = audioContext.createMediaElementSource(audio)
+        source.connect(analyser)
+        analyser.connect(audioContext.destination)
+
+        audioContextRef.current = audioContext
+        analyserRef.current = analyser
+        sourceRef.current = source
+      } catch (error) {
+        console.warn('Web Audio API not supported', error)
+      }
+    }
+
+    audio.addEventListener('play', setupAudioContext)
+    return () => {
+      audio.removeEventListener('play', setupAudioContext)
+    }
+  }, [])
 
   const safePlay = useCallback(() => {
     const audio = audioRef.current
@@ -367,6 +403,7 @@ function useDesktopMusicPlayer(tracks) {
 
   return {
     audioRef,
+    analyserRef,
     currentTrack,
     currentIndex,
     isPlaying,
@@ -385,7 +422,7 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  music: { x: 90, y: 70, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
+  music: { x: 90, y: 70, width: 300, height: 400, zIndex: 1, status: 'open', maximized: false },
   chat: { x: 410, y: 90, width: 340, height: 320, zIndex: 2, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
   photos: { x: 540, y: 190, width: 300, height: 280, zIndex: 4, status: 'open', maximized: false },
@@ -811,6 +848,109 @@ function ChatContent() {
   )
 }
 
+function MusicVisualizer({ analyserRef, isPlaying }) {
+  const canvasRef = useRef(null)
+  const animationRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const analyser = analyserRef.current
+    if (!canvas || !analyser) return
+
+    const ctx = canvas.getContext('2d')
+    const bufferLength = analyser.frequencyBinCount
+    const dataArray = new Uint8Array(bufferLength)
+
+    // Set canvas size
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect()
+      canvas.width = rect.width * window.devicePixelRatio
+      canvas.height = rect.height * window.devicePixelRatio
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+    }
+    resizeCanvas()
+
+    const draw = () => {
+      if (!isPlaying) {
+        // Draw static bars when paused
+        ctx.fillStyle = '#e8f7ff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        const barCount = 32
+        const barWidth = (canvas.width / window.devicePixelRatio) / barCount
+        const barGap = 2
+
+        for (let i = 0; i < barCount; i++) {
+          const barHeight = 4
+          const x = i * barWidth
+          const y = (canvas.height / window.devicePixelRatio) - barHeight - 4
+
+          ctx.fillStyle = PALETTE.secondary
+          ctx.fillRect(x, y, barWidth - barGap, barHeight)
+        }
+        return
+      }
+
+      analyser.getByteFrequencyData(dataArray)
+
+      ctx.fillStyle = '#e8f7ff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+      const barCount = 32
+      const barWidth = (canvas.width / window.devicePixelRatio) / barCount
+      const barGap = 2
+
+      for (let i = 0; i < barCount; i++) {
+        // Average multiple frequency bins for smoother visualization
+        const dataIndex = Math.floor((i / barCount) * bufferLength)
+        const value = dataArray[dataIndex]
+        const barHeight = (value / 255) * (canvas.height / window.devicePixelRatio - 8)
+
+        const x = i * barWidth
+        const y = (canvas.height / window.devicePixelRatio) - barHeight - 4
+
+        // Create gradient for each bar
+        const gradient = ctx.createLinearGradient(x, y, x, canvas.height / window.devicePixelRatio)
+        gradient.addColorStop(0, PALETTE.secondary)
+        gradient.addColorStop(1, PALETTE.accent)
+
+        ctx.fillStyle = gradient
+        ctx.fillRect(x, y, barWidth - barGap, barHeight)
+      }
+
+      animationRef.current = requestAnimationFrame(draw)
+    }
+
+    draw()
+    if (isPlaying) {
+      animationRef.current = requestAnimationFrame(draw)
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [analyserRef, isPlaying])
+
+  return (
+    <div
+      className="rounded-xl border-2 overflow-hidden"
+      style={{
+        borderColor: PALETTE.secondary,
+        backgroundColor: '#e8f7ff',
+        height: '100px',
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{ display: 'block' }}
+      />
+    </div>
+  )
+}
+
 function MusicContent({ player }) {
   if (!player || !player.currentTrack) {
     return (
@@ -836,6 +976,7 @@ function MusicContent({ player }) {
     selectTrack,
     seekTo,
     currentIndex,
+    analyserRef,
   } = player
 
   const handleSeek = (event) => {
@@ -903,6 +1044,8 @@ function MusicContent({ player }) {
           </div>
         )}
       </div>
+
+      {analyserRef && <MusicVisualizer analyserRef={analyserRef} isPlaying={isPlaying} />}
 
       <div className="flex items-center justify-center gap-3">
         <button
