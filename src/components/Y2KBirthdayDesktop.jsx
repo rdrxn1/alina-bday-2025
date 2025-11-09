@@ -422,10 +422,10 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  music: { x: 90, y: 70, width: 300, height: 400, zIndex: 1, status: 'open', maximized: false },
-  chat: { x: 410, y: 90, width: 340, height: 320, zIndex: 2, status: 'open', maximized: false },
-  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
-  photos: { x: 540, y: 190, width: 300, height: 280, zIndex: 4, status: 'open', maximized: false },
+  music: { x: 90, y: 70, width: 300, height: 410, zIndex: 4, status: 'open', maximized: false },
+  chat: { x: 410, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
+  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
+  photos: { x: 540, y: 190, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
 }
 
 function Y2KBirthdayDesktop() {
@@ -861,62 +861,146 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
+    let animationTime = 0
+
     // Set canvas size
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width * window.devicePixelRatio
-      canvas.height = rect.height * window.devicePixelRatio
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      canvas.width = rect.width
+      canvas.height = rect.height
     }
     resizeCanvas()
 
     const draw = () => {
+      const width = canvas.width
+      const height = canvas.height
+
+      // Clear with background
+      ctx.fillStyle = '#e8f7ff'
+      ctx.fillRect(0, 0, width, height)
+
       if (!isPlaying) {
-        // Draw static bars when paused
-        ctx.fillStyle = '#e8f7ff'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        // Draw static ambient pattern when paused
+        ctx.globalAlpha = 0.3
+        const centerX = width / 2
+        const centerY = height / 2
 
-        const barCount = 32
-        const barWidth = (canvas.width / window.devicePixelRatio) / barCount
-        const barGap = 2
+        for (let i = 0; i < 3; i++) {
+          const radius = 20 + i * 15
+          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius)
+          gradient.addColorStop(0, PALETTE.secondary + '40')
+          gradient.addColorStop(1, 'transparent')
 
-        for (let i = 0; i < barCount; i++) {
-          const barHeight = 4
-          const x = i * barWidth
-          const y = (canvas.height / window.devicePixelRatio) - barHeight - 4
-
-          ctx.fillStyle = PALETTE.secondary
-          ctx.fillRect(x, y, barWidth - barGap, barHeight)
+          ctx.fillStyle = gradient
+          ctx.beginPath()
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+          ctx.fill()
         }
+        ctx.globalAlpha = 1
         return
       }
 
+      animationTime += 0.05
       analyser.getByteFrequencyData(dataArray)
 
-      ctx.fillStyle = '#e8f7ff'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      // Calculate average frequency for global effects
+      let sum = 0
+      for (let i = 0; i < bufferLength; i++) {
+        sum += dataArray[i]
+      }
+      const average = sum / bufferLength
+      const intensity = average / 255
 
-      const barCount = 32
-      const barWidth = (canvas.width / window.devicePixelRatio) / barCount
-      const barGap = 2
+      const centerX = width / 2
+      const centerY = height / 2
 
-      for (let i = 0; i < barCount; i++) {
-        // Average multiple frequency bins for smoother visualization
-        const dataIndex = Math.floor((i / barCount) * bufferLength)
-        const value = dataArray[dataIndex]
-        const barHeight = (value / 255) * (canvas.height / window.devicePixelRatio - 8)
+      // Draw flowing wave patterns (mirrored top and bottom)
+      ctx.save()
+      ctx.globalAlpha = 0.6
 
-        const x = i * barWidth
-        const y = (canvas.height / window.devicePixelRatio) - barHeight - 4
+      const waveCount = 2
+      const points = 64
 
-        // Create gradient for each bar
-        const gradient = ctx.createLinearGradient(x, y, x, canvas.height / window.devicePixelRatio)
+      for (let wave = 0; wave < waveCount; wave++) {
+        ctx.beginPath()
+
+        for (let i = 0; i <= points; i++) {
+          const x = (i / points) * width
+          const dataIndex = Math.floor((i / points) * bufferLength)
+          const value = dataArray[dataIndex] / 255
+
+          // Create flowing wave effect
+          const wavePhase = (animationTime + wave * 0.5) * 2
+          const baseY = centerY + Math.sin(wavePhase + i * 0.1) * 8
+          const amplitude = value * (height * 0.35) + 5
+          const y = baseY + amplitude * (wave % 2 === 0 ? -1 : 1)
+
+          if (i === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+
+        // Create gradient for waves
+        const gradient = ctx.createLinearGradient(0, 0, width, 0)
         gradient.addColorStop(0, PALETTE.secondary)
-        gradient.addColorStop(1, PALETTE.accent)
+        gradient.addColorStop(0.5, PALETTE.accent)
+        gradient.addColorStop(1, PALETTE.lavender)
+
+        ctx.strokeStyle = gradient
+        ctx.lineWidth = 3
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.stroke()
+      }
+
+      ctx.restore()
+
+      // Draw pulsing circular elements based on frequency bands
+      ctx.save()
+      ctx.globalAlpha = 0.4
+
+      const bands = 5
+      for (let i = 0; i < bands; i++) {
+        const bandIndex = Math.floor((i / bands) * bufferLength)
+        const bandValue = dataArray[bandIndex] / 255
+
+        const angle = (i / bands) * Math.PI * 2 + animationTime
+        const distance = 40 + bandValue * 30
+        const x = centerX + Math.cos(angle) * distance
+        const y = centerY + Math.sin(angle) * distance
+        const radius = 8 + bandValue * 12
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
+        gradient.addColorStop(0, PALETTE.secondary)
+        gradient.addColorStop(0.7, PALETTE.accent)
+        gradient.addColorStop(1, 'transparent')
 
         ctx.fillStyle = gradient
-        ctx.fillRect(x, y, barWidth - barGap, barHeight)
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
+        ctx.fill()
       }
+
+      ctx.restore()
+
+      // Draw center pulsing glow
+      ctx.save()
+      ctx.globalAlpha = 0.3 + intensity * 0.4
+
+      const pulseRadius = 25 + intensity * 20
+      const centerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius)
+      centerGradient.addColorStop(0, PALETTE.lavender + '80')
+      centerGradient.addColorStop(0.5, PALETTE.accent + '40')
+      centerGradient.addColorStop(1, 'transparent')
+
+      ctx.fillStyle = centerGradient
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2)
+      ctx.fill()
+
+      ctx.restore()
 
       animationRef.current = requestAnimationFrame(draw)
     }
@@ -935,11 +1019,11 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
 
   return (
     <div
-      className="rounded-xl border-2 overflow-hidden"
+      className="rounded-lg border-2 overflow-hidden"
       style={{
         borderColor: PALETTE.secondary,
         backgroundColor: '#e8f7ff',
-        height: '100px',
+        height: '110px',
       }}
     >
       <canvas
@@ -988,9 +1072,9 @@ function MusicContent({ player }) {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-full flex-col gap-3 p-3">
       <div
-        className="space-y-3 rounded-xl border-2 p-4 shadow-[0_18px_40px_rgba(124,210,255,0.2)]"
+        className="space-y-2.5 rounded-xl border-2 p-3 shadow-[0_18px_40px_rgba(124,210,255,0.2)]"
         style={{
           borderColor: PALETTE.secondary,
           backgroundColor: '#e8f7ff',
