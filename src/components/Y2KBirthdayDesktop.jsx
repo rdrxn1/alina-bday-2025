@@ -897,9 +897,15 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
       const barGap = 1
       const maxBarHeight = height / 2 - 10
 
+      // Sample mainly from lower frequencies (where most music energy is)
+      // Use only first 60% of frequency data for better visualization
+      const usableBufferLength = Math.floor(bufferLength * 0.6)
+
       // Draw bars mirrored from center
       for (let i = 0; i < barCount; i++) {
-        const dataIndex = Math.floor((i / barCount) * bufferLength)
+        // Map bar index to frequency data with emphasis on lower frequencies
+        const normalizedIndex = i / (barCount - 1)
+        const dataIndex = Math.floor(normalizedIndex * usableBufferLength)
         const value = dataArray[dataIndex] / 255
         const barHeight = value * maxBarHeight
 
@@ -968,6 +974,9 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
 }
 
 function MusicContent({ player }) {
+  const [isDragging, setIsDragging] = useState(false)
+  const progressBarRef = useRef(null)
+
   if (!player || !player.currentTrack) {
     return (
       <div
@@ -995,13 +1004,39 @@ function MusicContent({ player }) {
     analyserRef,
   } = player
 
-  const handleSeek = (event) => {
+  const handleSeek = useCallback((event) => {
     if (!duration) return
-    const bounds = event.currentTarget.getBoundingClientRect()
+    const bounds = progressBarRef.current?.getBoundingClientRect()
+    if (!bounds) return
     const offset = event.clientX - bounds.left
     const percent = Math.min(Math.max(offset / bounds.width, 0), 1)
     seekTo(percent)
-  }
+  }, [duration, seekTo])
+
+  const handleMouseDown = useCallback((event) => {
+    setIsDragging(true)
+    handleSeek(event)
+  }, [handleSeek])
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (event) => {
+      handleSeek(event)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, handleSeek])
 
   return (
     <div className="flex h-full flex-col gap-3 p-3">
@@ -1027,13 +1062,15 @@ function MusicContent({ player }) {
         </div>
         <div className="space-y-2">
           <div
-            className="relative h-5 w-full cursor-pointer overflow-visible rounded-full border-2"
+            ref={progressBarRef}
+            className="relative h-5 w-full overflow-visible rounded-full border-2"
             style={{
               borderColor: PALETTE.secondary,
               backgroundColor: '#cfefff',
               boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
+              cursor: isDragging ? 'grabbing' : 'grab',
             }}
-            onClick={handleSeek}
+            onMouseDown={handleMouseDown}
           >
             <div
               className="absolute inset-y-0 left-0 rounded-full"
