@@ -30,7 +30,7 @@ function App() {
       <LandingScreen2
         version="24.0"
         theme="dark"
-        onReady={handleV24Ready}
+        onEnter={handleV24Ready}
       />
     )
   }
