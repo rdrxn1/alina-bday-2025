@@ -1,11 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-export default function AlinaOSBoot({ onEnter }) {
+export default function AlinaOSBoot({
+  version = '25.0',
+  theme = 'light',
+  onEnter,
+  onReady
+}) {
   const enterSystem = useCallback(() => {
     if (typeof onEnter === 'function') {
       onEnter();
     }
   }, [onEnter]);
+
+  // Call onReady after animations complete (about 3.5s)
+  useEffect(() => {
+    if (typeof onReady === 'function') {
+      const timer = setTimeout(() => {
+        onReady();
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [onReady]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -20,6 +35,36 @@ export default function AlinaOSBoot({ onEnter }) {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [enterSystem]);
+
+  // Theme colors
+  const themes = {
+    dark: {
+      bgGradient: 'linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #0a0a0a 100%)',
+      dotColor: '%23ff0000',
+      logoColor: '#ffffff',
+      logoShadow: '#ff0000',
+      versionColor: '#ff3333',
+      textColor: '#ff6666',
+      accentColor: '#ff0000',
+      btnBg: 'linear-gradient(180deg, #ff3333 0%, #cc0000 100%)',
+      btnBorder: '#ff0000',
+      btnText: '#ffffff',
+    },
+    light: {
+      bgGradient: 'linear-gradient(135deg, #ffe6f2 0%, #ffd8e9 50%, #ffe6f2 100%)',
+      dotColor: '%23ff85bb',
+      logoColor: '#ffffff',
+      logoShadow: '#ff9fcf',
+      versionColor: '#ff9fcf',
+      textColor: '#8a6ba0',
+      accentColor: '#ff9fcf',
+      btnBg: 'linear-gradient(180deg, #ffc6df 0%, #ff9fcf 100%)',
+      btnBorder: '#ff85bb',
+      btnText: '#5a3d7a',
+    }
+  };
+
+  const currentTheme = themes[theme] || themes.light;
 
   return (
     <>
@@ -41,7 +86,7 @@ export default function AlinaOSBoot({ onEnter }) {
           position: relative;
           width: 100vw;
           height: 100vh;
-          background: linear-gradient(135deg, #ffe6f2 0%, #ffd8e9 50%, #ffe6f2 100%);
+          background: ${currentTheme.bgGradient};
           overflow: hidden;
           display: flex;
           flex-direction: column;
@@ -58,7 +103,7 @@ export default function AlinaOSBoot({ onEnter }) {
           left: 0;
           right: 0;
           bottom: 0;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='2.5' cy='2.5' r='1.2' fill='%23ff85bb'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Ccircle cx='2.5' cy='2.5' r='1.2' fill='${currentTheme.dotColor}'/%3E%3C/svg%3E");
           opacity: 0.3;
           pointer-events: none;
         }
@@ -105,13 +150,13 @@ export default function AlinaOSBoot({ onEnter }) {
         }
 
         .logo-white {
-          color: white;
+          color: ${currentTheme.logoColor};
           position: relative;
           z-index: 2;
         }
 
         .logo-pink {
-          color: #ff9fcf;
+          color: ${currentTheme.logoShadow};
           position: absolute;
           top: 6px;
           left: 6px;
@@ -121,7 +166,7 @@ export default function AlinaOSBoot({ onEnter }) {
         .version {
           font-family: 'VT323', monospace;
           font-size: 2rem;
-          color: #ff9fcf;
+          color: ${currentTheme.versionColor};
           letter-spacing: 0.1em;
           margin-top: -2rem;
           opacity: 0;
@@ -144,7 +189,7 @@ export default function AlinaOSBoot({ onEnter }) {
           gap: 0.5rem;
           font-family: 'VT323', monospace;
           font-size: 1.8rem;
-          color: #8a6ba0;
+          color: ${currentTheme.textColor};
         }
 
         .boot-messages div {
@@ -174,7 +219,7 @@ export default function AlinaOSBoot({ onEnter }) {
           width: 100%;
           max-width: 400px;
           height: 3px;
-          background: #ff9fcf;
+          background: ${currentTheme.accentColor};
           opacity: 0;
           animation: fadeIn 0.6s ease-out forwards;
           animation-delay: 2.2s;
@@ -190,7 +235,7 @@ export default function AlinaOSBoot({ onEnter }) {
         .tagline {
           font-family: 'VT323', monospace;
           font-size: 1.8rem;
-          color: #8a6ba0;
+          color: ${currentTheme.textColor};
           font-style: italic;
           opacity: 0;
           animation: fadeIn 0.6s ease-out forwards;
@@ -200,7 +245,7 @@ export default function AlinaOSBoot({ onEnter }) {
         .prompt {
           font-family: 'VT323', monospace;
           font-size: 1.6rem;
-          color: #8a6ba0;
+          color: ${currentTheme.textColor};
           opacity: 0;
           animation: fadeIn 0.6s ease-out forwards;
           animation-delay: 3.0s;
@@ -218,17 +263,17 @@ export default function AlinaOSBoot({ onEnter }) {
         .enter-btn {
           font-family: 'VT323', monospace;
           font-size: 1.8rem;
-          color: #5a3d7a;
-          background: linear-gradient(180deg, #ffc6df 0%, #ff9fcf 100%);
-          border: 3px solid #ff85bb;
+          color: ${currentTheme.btnText};
+          background: ${currentTheme.btnBg};
+          border: 3px solid ${currentTheme.btnBorder};
           padding: 1rem 3rem;
           cursor: pointer;
           text-transform: uppercase;
           letter-spacing: 0.15em;
           transition: all 0.2s;
           box-shadow:
-            0 4px 0 #ff85bb,
-            0 8px 16px rgba(255, 159, 207, 0.3);
+            0 4px 0 ${currentTheme.btnBorder},
+            0 8px 16px ${theme === 'dark' ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 159, 207, 0.3)'};
           opacity: 0;
           animation: fadeIn 0.6s ease-out forwards;
           animation-delay: 3.4s;
@@ -237,15 +282,15 @@ export default function AlinaOSBoot({ onEnter }) {
         .enter-btn:hover {
           transform: translateY(-2px);
           box-shadow:
-            0 6px 0 #ff85bb,
-            0 12px 20px rgba(255, 159, 207, 0.4);
+            0 6px 0 ${currentTheme.btnBorder},
+            0 12px 20px ${theme === 'dark' ? 'rgba(255, 0, 0, 0.4)' : 'rgba(255, 159, 207, 0.4)'};
         }
 
         .enter-btn:active {
           transform: translateY(2px);
           box-shadow:
-            0 2px 0 #ff85bb,
-            0 4px 12px rgba(255, 159, 207, 0.3);
+            0 2px 0 ${currentTheme.btnBorder},
+            0 4px 12px ${theme === 'dark' ? 'rgba(255, 0, 0, 0.3)' : 'rgba(255, 159, 207, 0.3)'};
         }
 
 
@@ -378,7 +423,7 @@ export default function AlinaOSBoot({ onEnter }) {
             <div className="logo logo-white">AlinaOS</div>
           </div>
 
-          <div className="version">v25.0</div>
+          <div className="version">v{version}</div>
 
           <div className="boot-messages">
             <div>&gt; INITIALIZING BIRTHDAY SYSTEM...</div>
@@ -391,7 +436,7 @@ export default function AlinaOSBoot({ onEnter }) {
           <div className="divider"></div>
 
           <div className="prompt-section">
-            <div className="tagline">A lavender night made just for you</div>
+            <div className="tagline">{theme === 'dark' ? 'System ready for update' : 'A lavender night made just for you'}</div>
             <div className="prompt">
               PRESS ENTER TO CONTINUE<span className="cursor">_</span>
             </div>
