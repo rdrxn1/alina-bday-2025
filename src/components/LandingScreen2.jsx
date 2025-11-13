@@ -74,7 +74,7 @@ export default function AlinaOSBoot({
         '> Initialising core services...',
         '> Loading critical subsystems...',
         '> Verifying system integrity... OK',
-        '> Awaiting your cue... press Enter to continue.'
+        '> Operator input required to continue.'
       ]
     : [
         '> INITIALIZING BIRTHDAY SYSTEM...',

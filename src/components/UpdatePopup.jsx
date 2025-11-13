@@ -67,7 +67,7 @@ export default function UpdatePopup({ onUpdate }) {
 
         .dialog-title {
           font-size: 2.4rem;
-          color: #ff8080;
+          color: #ff6666;
           text-transform: uppercase;
           letter-spacing: 0.08em;
           margin: 0;
@@ -107,7 +107,7 @@ export default function UpdatePopup({ onUpdate }) {
         }
 
         .dialog-body {
-          color: #ffbfbf;
+          color: #ffb3b3;
           font-size: 1.5rem;
           line-height: 1.7;
           display: flex;
@@ -119,26 +119,32 @@ export default function UpdatePopup({ onUpdate }) {
           margin: 0;
         }
 
-        .highlights-panel {
+        .version-details {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
           background: rgba(0, 0, 0, 0.6);
-          border: 1px solid rgba(255, 102, 102, 0.25);
+          border: 1px solid rgba(255, 51, 51, 0.25);
           border-radius: 12px;
-          padding: 1.2rem 1.4rem;
+          padding: 1.2rem;
+        }
+
+        .detail {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.35rem;
         }
 
-        .panel-heading {
-          font-size: 1.3rem;
-          letter-spacing: 0.12em;
+        .detail-label {
+          font-size: 1.2rem;
           text-transform: uppercase;
-          color: #ff9494;
+          letter-spacing: 0.12em;
+          color: #ff8080;
         }
 
-        .panel-note {
-          font-size: 1.4rem;
-          color: #ffe1e1;
+        .detail-value {
+          font-size: 1.6rem;
+          color: #ffffff;
         }
 
         .features-heading {
@@ -177,7 +183,7 @@ export default function UpdatePopup({ onUpdate }) {
 
         .note {
           font-size: 1.3rem;
-          color: #ff9f9f;
+          color: #ff8f8f;
           text-align: center;
         }
 
@@ -222,6 +228,10 @@ export default function UpdatePopup({ onUpdate }) {
             font-size: 1.35rem;
           }
 
+          .version-details {
+            grid-template-columns: 1fr;
+          }
+
           .update-btn {
             width: 100%;
           }
@@ -241,26 +251,30 @@ export default function UpdatePopup({ onUpdate }) {
 
           <div className="dialog-body">
             <p className="summary">
-              A polished update is staged so AlinaOS can mark your 25th celebration with a fresh build. Take a moment to look over the highlights and continue whenever you're ready.
+              A verified system update is prepared to take AlinaOS from the current 24-series build to the 25 release. Review the change summary below and confirm when you are ready to proceed.
             </p>
 
-            <div className="highlights-panel">
-              <div className="panel-heading">What this update means</div>
-              <p className="panel-note">
-                New customisations, a calmer interface, and a few lovingly prepared surprises are queued to roll out the moment you give the go-ahead.
-              </p>
+            <div className="version-details">
+              <div className="detail">
+                <span className="detail-label">Current build</span>
+                <span className="detail-value">v24.0</span>
+              </div>
+              <div className="detail">
+                <span className="detail-label">Target build</span>
+                <span className="detail-value">v25.0</span>
+              </div>
             </div>
 
             <div>
               <div className="features-heading">Release focus</div>
               <ul className="update-features">
-                <li>Birthday timeline polished for a cosy replay</li>
-                <li>Moments hub refreshed with gentle animations</li>
-                <li>Celebration controls tuned to match your pace</li>
+                <li>Stability tuning across core services</li>
+                <li>Extended monitoring for system health</li>
+                <li>Security hardening and patch rollup</li>
               </ul>
             </div>
 
-            <p className="note">Press ENTER or use the control below when you feel ready to continue.</p>
+            <p className="note">Press ENTER or use the control below to continue with the update.</p>
           </div>
 
           <div className="dialog-footer">
