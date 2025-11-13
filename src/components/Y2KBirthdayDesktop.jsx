@@ -861,17 +861,39 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
-    // Set canvas size
-    const resizeCanvas = () => {
+    const setCanvasSize = () => {
       const rect = canvas.getBoundingClientRect()
-      canvas.width = rect.width
-      canvas.height = rect.height
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = rect.width * dpr
+      canvas.height = rect.height * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
-    resizeCanvas()
+
+    setCanvasSize()
+
+    const resizeObserver =
+      typeof window !== 'undefined' && 'ResizeObserver' in window
+        ? new ResizeObserver(() => {
+            setCanvasSize()
+          })
+        : null
+
+    if (resizeObserver) {
+      resizeObserver.observe(canvas)
+    }
+
+    const handleWindowResize = () => {
+      setCanvasSize()
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleWindowResize)
+    }
 
     const draw = () => {
-      const width = canvas.width
-      const height = canvas.height
+      const dpr = window.devicePixelRatio || 1
+      const width = canvas.width / dpr
+      const height = canvas.height / dpr
       const centerY = height / 2
 
       // Clear with background
@@ -951,6 +973,12 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
+      }
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleWindowResize)
+      }
+      if (resizeObserver) {
+        resizeObserver.disconnect()
       }
     }
   }, [analyserRef, isPlaying])
