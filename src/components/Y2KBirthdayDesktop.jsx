@@ -861,8 +861,6 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
-    let animationTime = 0
-
     // Set canvas size
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect()
@@ -874,133 +872,65 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     const draw = () => {
       const width = canvas.width
       const height = canvas.height
+      const centerY = height / 2
 
       // Clear with background
       ctx.fillStyle = '#e8f7ff'
       ctx.fillRect(0, 0, width, height)
 
       if (!isPlaying) {
-        // Draw static ambient pattern when paused
-        ctx.globalAlpha = 0.3
-        const centerX = width / 2
-        const centerY = height / 2
-
-        for (let i = 0; i < 3; i++) {
-          const radius = 20 + i * 15
-          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius)
-          gradient.addColorStop(0, PALETTE.secondary + '40')
-          gradient.addColorStop(1, 'transparent')
-
-          ctx.fillStyle = gradient
-          ctx.beginPath()
-          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
-          ctx.fill()
-        }
-        ctx.globalAlpha = 1
+        // Draw static centerline when paused
+        ctx.strokeStyle = PALETTE.secondary + '40'
+        ctx.lineWidth = 2
+        ctx.beginPath()
+        ctx.moveTo(0, centerY)
+        ctx.lineTo(width, centerY)
+        ctx.stroke()
         return
       }
 
-      animationTime += 0.05
       analyser.getByteFrequencyData(dataArray)
 
-      // Calculate average frequency for global effects
-      let sum = 0
-      for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i]
-      }
-      const average = sum / bufferLength
-      const intensity = average / 255
+      // Draw traditional waveform
+      const barCount = 64
+      const barWidth = width / barCount
+      const maxBarHeight = height / 2 - 10
 
-      const centerX = width / 2
-      const centerY = height / 2
+      // Draw bars mirrored from center
+      for (let i = 0; i < barCount; i++) {
+        const dataIndex = Math.floor((i / barCount) * bufferLength)
+        const value = dataArray[dataIndex] / 255
+        const barHeight = value * maxBarHeight
 
-      // Draw flowing wave patterns (mirrored top and bottom)
-      ctx.save()
-      ctx.globalAlpha = 0.6
+        const x = i * barWidth
 
-      const waveCount = 2
-      const points = 64
+        // Create gradient for each bar
+        const topGradient = ctx.createLinearGradient(x, centerY - barHeight, x, centerY)
+        topGradient.addColorStop(0, PALETTE.secondary)
+        topGradient.addColorStop(0.6, PALETTE.accent)
+        topGradient.addColorStop(1, PALETTE.lavender + '60')
 
-      for (let wave = 0; wave < waveCount; wave++) {
-        ctx.beginPath()
+        const bottomGradient = ctx.createLinearGradient(x, centerY, x, centerY + barHeight)
+        bottomGradient.addColorStop(0, PALETTE.lavender + '60')
+        bottomGradient.addColorStop(0.4, PALETTE.accent)
+        bottomGradient.addColorStop(1, PALETTE.secondary)
 
-        for (let i = 0; i <= points; i++) {
-          const x = (i / points) * width
-          const dataIndex = Math.floor((i / points) * bufferLength)
-          const value = dataArray[dataIndex] / 255
+        // Draw top half (above center)
+        ctx.fillStyle = topGradient
+        ctx.fillRect(x + 1, centerY - barHeight, barWidth - 2, barHeight)
 
-          // Create flowing wave effect
-          const wavePhase = (animationTime + wave * 0.5) * 2
-          const baseY = centerY + Math.sin(wavePhase + i * 0.1) * 8
-          const amplitude = value * (height * 0.35) + 5
-          const y = baseY + amplitude * (wave % 2 === 0 ? -1 : 1)
-
-          if (i === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
-        }
-
-        // Create gradient for waves
-        const gradient = ctx.createLinearGradient(0, 0, width, 0)
-        gradient.addColorStop(0, PALETTE.secondary)
-        gradient.addColorStop(0.5, PALETTE.accent)
-        gradient.addColorStop(1, PALETTE.lavender)
-
-        ctx.strokeStyle = gradient
-        ctx.lineWidth = 3
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
-        ctx.stroke()
+        // Draw bottom half (below center)
+        ctx.fillStyle = bottomGradient
+        ctx.fillRect(x + 1, centerY, barWidth - 2, barHeight)
       }
 
-      ctx.restore()
-
-      // Draw pulsing circular elements based on frequency bands
-      ctx.save()
-      ctx.globalAlpha = 0.4
-
-      const bands = 5
-      for (let i = 0; i < bands; i++) {
-        const bandIndex = Math.floor((i / bands) * bufferLength)
-        const bandValue = dataArray[bandIndex] / 255
-
-        const angle = (i / bands) * Math.PI * 2 + animationTime
-        const distance = 40 + bandValue * 30
-        const x = centerX + Math.cos(angle) * distance
-        const y = centerY + Math.sin(angle) * distance
-        const radius = 8 + bandValue * 12
-
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-        gradient.addColorStop(0, PALETTE.secondary)
-        gradient.addColorStop(0.7, PALETTE.accent)
-        gradient.addColorStop(1, 'transparent')
-
-        ctx.fillStyle = gradient
-        ctx.beginPath()
-        ctx.arc(x, y, radius, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      ctx.restore()
-
-      // Draw center pulsing glow
-      ctx.save()
-      ctx.globalAlpha = 0.3 + intensity * 0.4
-
-      const pulseRadius = 25 + intensity * 20
-      const centerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius)
-      centerGradient.addColorStop(0, PALETTE.lavender + '80')
-      centerGradient.addColorStop(0.5, PALETTE.accent + '40')
-      centerGradient.addColorStop(1, 'transparent')
-
-      ctx.fillStyle = centerGradient
+      // Draw subtle center line
+      ctx.strokeStyle = PALETTE.secondary + '30'
+      ctx.lineWidth = 1
       ctx.beginPath()
-      ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2)
-      ctx.fill()
-
-      ctx.restore()
+      ctx.moveTo(0, centerY)
+      ctx.lineTo(width, centerY)
+      ctx.stroke()
 
       animationRef.current = requestAnimationFrame(draw)
     }
