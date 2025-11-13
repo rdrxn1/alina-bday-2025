@@ -12,12 +12,14 @@ export default function UpdatePopup({ onUpdate }) {
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 50%, #0a0a0a 100%);
+          background: radial-gradient(circle at top, rgba(255, 0, 0, 0.18), transparent 55%),
+            linear-gradient(135deg, #050505 0%, #180000 50%, #050505 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           font-family: 'VT323', monospace;
-          animation: fadeInOverlay 0.3s ease-out;
+          animation: fadeInOverlay 0.35s ease-out;
+          padding: 2rem;
         }
 
         @keyframes fadeInOverlay {
@@ -30,20 +32,22 @@ export default function UpdatePopup({ onUpdate }) {
         }
 
         .update-dialog {
-          background: #1a1a1a;
-          border: 4px solid #ff0000;
+          background: rgba(8, 8, 8, 0.92);
+          border: 1px solid rgba(255, 51, 51, 0.7);
+          border-radius: 18px;
           box-shadow:
-            0 0 20px rgba(255, 0, 0, 0.5),
-            inset 0 0 30px rgba(255, 0, 0, 0.1);
-          padding: 2rem;
-          max-width: 500px;
-          width: 90%;
-          animation: slideInDialog 0.4s ease-out;
+            0 22px 60px rgba(255, 0, 0, 0.35),
+            inset 0 0 0 rgba(255, 0, 0, 0.2);
+          padding: 2.5rem;
+          max-width: 560px;
+          width: min(90vw, 560px);
+          animation: slideInDialog 0.45s ease-out;
+          backdrop-filter: blur(4px);
         }
 
         @keyframes slideInDialog {
           from {
-            transform: translateY(-50px);
+            transform: translateY(-40px);
             opacity: 0;
           }
           to {
@@ -53,146 +57,165 @@ export default function UpdatePopup({ onUpdate }) {
         }
 
         .dialog-header {
-          border-bottom: 3px solid #ff0000;
-          padding-bottom: 1rem;
-          margin-bottom: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 2.5rem;
+          text-align: center;
         }
 
         .dialog-title {
-          font-size: 2.5rem;
-          color: #ff3333;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          margin: 0;
-          text-align: center;
-        }
-
-        .dialog-icon {
-          font-size: 4rem;
-          text-align: center;
-          margin-bottom: 1rem;
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.7;
-            transform: scale(1.1);
-          }
-        }
-
-        .dialog-content {
+          font-size: 2.4rem;
           color: #ff6666;
-          font-size: 1.6rem;
-          line-height: 1.8;
-          margin-bottom: 2rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin: 0;
         }
 
-        .version-info {
-          background: #0a0a0a;
-          border: 2px solid #ff0000;
-          padding: 1rem;
-          margin: 1.5rem 0;
-          text-align: center;
+        .version-strip {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 1.6rem;
+          color: #ff9b9b;
+        }
+
+        .version-pill {
+          padding: 0.35rem 1.4rem;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 102, 102, 0.6);
+          background: rgba(255, 51, 51, 0.12);
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .version-pill--old {
+          color: #ffbfbf;
+        }
+
+        .version-pill--new {
+          color: #ffffff;
+          border-color: rgba(255, 51, 51, 0.9);
+          background: rgba(255, 51, 51, 0.24);
+          box-shadow: 0 0 16px rgba(255, 51, 51, 0.5);
         }
 
         .version-arrow {
-          color: #ff3333;
-          margin: 0 1rem;
-          font-size: 2rem;
+          color: #ff4d4d;
+          font-size: 1.8rem;
         }
 
-        .version-old {
-          color: #ff6666;
-          text-decoration: line-through;
+        .dialog-body {
+          color: #ffb3b3;
+          font-size: 1.5rem;
+          line-height: 1.7;
+          display: flex;
+          flex-direction: column;
+          gap: 1.8rem;
         }
 
-        .version-new {
-          color: #ff3333;
-          font-weight: bold;
-          animation: glow 2s infinite;
+        .summary {
+          margin: 0;
         }
 
-        @keyframes glow {
-          0%, 100% {
-            text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
-          }
-          50% {
-            text-shadow: 0 0 20px rgba(255, 51, 51, 0.8);
-          }
+        .version-details {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(255, 51, 51, 0.25);
+          border-radius: 12px;
+          padding: 1.2rem;
+        }
+
+        .detail {
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .detail-label {
+          font-size: 1.2rem;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: #ff8080;
+        }
+
+        .detail-value {
+          font-size: 1.6rem;
+          color: #ffffff;
+        }
+
+        .features-heading {
+          font-size: 1.4rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #ff8080;
         }
 
         .update-features {
           list-style: none;
           padding: 0;
-          margin: 1rem 0;
+          margin: 0.75rem 0 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.6rem;
         }
 
         .update-features li {
-          padding: 0.5rem 0;
-          color: #ff8888;
+          padding-left: 1.6rem;
+          position: relative;
+          color: #ffd6d6;
         }
 
         .update-features li::before {
-          content: '> ';
-          color: #ff0000;
-          font-weight: bold;
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0.55rem;
+          width: 0.8rem;
+          height: 0.8rem;
+          border-radius: 50%;
+          border: 2px solid #ff4d4d;
+          box-shadow: 0 0 6px rgba(255, 51, 51, 0.6);
+        }
+
+        .note {
+          font-size: 1.3rem;
+          color: #ff8f8f;
+          text-align: center;
         }
 
         .dialog-footer {
           display: flex;
-          gap: 1rem;
           justify-content: center;
-          margin-top: 2rem;
+          margin-top: 1.5rem;
         }
 
         .update-btn {
           font-family: 'VT323', monospace;
-          font-size: 1.8rem;
+          font-size: 1.7rem;
           color: #ffffff;
-          background: linear-gradient(180deg, #ff3333 0%, #cc0000 100%);
-          border: 3px solid #ff0000;
-          padding: 1rem 3rem;
+          background: linear-gradient(180deg, #ff4444 0%, #cc1111 100%);
+          border: 2px solid rgba(255, 68, 68, 0.9);
+          border-radius: 999px;
+          padding: 1rem 3.5rem;
           cursor: pointer;
           text-transform: uppercase;
-          letter-spacing: 0.15em;
-          transition: all 0.2s;
-          box-shadow:
-            0 4px 0 #cc0000,
-            0 8px 16px rgba(255, 0, 0, 0.3);
-          animation: buttonPulse 2s infinite;
-        }
-
-        @keyframes buttonPulse {
-          0%, 100% {
-            box-shadow:
-              0 4px 0 #cc0000,
-              0 8px 16px rgba(255, 0, 0, 0.3);
-          }
-          50% {
-            box-shadow:
-              0 4px 0 #cc0000,
-              0 8px 24px rgba(255, 0, 0, 0.5);
-          }
+          letter-spacing: 0.18em;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          box-shadow: 0 10px 24px rgba(255, 17, 17, 0.35);
         }
 
         .update-btn:hover {
           transform: translateY(-2px);
-          box-shadow:
-            0 6px 0 #cc0000,
-            0 12px 20px rgba(255, 0, 0, 0.5);
-          animation: none;
+          box-shadow: 0 16px 28px rgba(255, 17, 17, 0.45);
         }
 
         .update-btn:active {
-          transform: translateY(2px);
-          box-shadow:
-            0 2px 0 #cc0000,
-            0 4px 12px rgba(255, 0, 0, 0.3);
+          transform: translateY(1px);
+          box-shadow: 0 6px 18px rgba(255, 17, 17, 0.4);
         }
 
         /* Responsive */
@@ -201,12 +224,15 @@ export default function UpdatePopup({ onUpdate }) {
             font-size: 2rem;
           }
 
-          .dialog-content {
-            font-size: 1.4rem;
+          .dialog-body {
+            font-size: 1.35rem;
+          }
+
+          .version-details {
+            grid-template-columns: 1fr;
           }
 
           .update-btn {
-            font-size: 1.5rem;
             width: 100%;
           }
         }
@@ -214,36 +240,46 @@ export default function UpdatePopup({ onUpdate }) {
 
       <div className="update-popup-overlay">
         <div className="update-dialog">
-          <div className="dialog-icon">⚠️</div>
-
           <div className="dialog-header">
-            <h2 className="dialog-title">Update Available</h2>
+            <h2 className="dialog-title">AlinaOS Update</h2>
+            <div className="version-strip">
+              <span className="version-pill version-pill--old">v24</span>
+              <span className="version-arrow">→</span>
+              <span className="version-pill version-pill--new">v25</span>
+            </div>
           </div>
 
-          <div className="dialog-content">
-            <p>A new version of AlinaOS is ready to install!</p>
+          <div className="dialog-body">
+            <p className="summary">
+              A verified system update is prepared to take AlinaOS from the current 24-series build to the 25 release. Review the change summary below and confirm when you are ready to proceed.
+            </p>
 
-            <div className="version-info">
-              <span className="version-old">v24.0</span>
-              <span className="version-arrow">→</span>
-              <span className="version-new">v25.0</span>
+            <div className="version-details">
+              <div className="detail">
+                <span className="detail-label">Current build</span>
+                <span className="detail-value">v24.0</span>
+              </div>
+              <div className="detail">
+                <span className="detail-label">Target build</span>
+                <span className="detail-value">v25.0</span>
+              </div>
             </div>
 
-            <ul className="update-features">
-              <li>Enhanced lavender night mode</li>
-              <li>New celebration features</li>
-              <li>Improved sparkle modules</li>
-              <li>Birthday system optimizations</li>
-            </ul>
+            <div>
+              <div className="features-heading">Release focus</div>
+              <ul className="update-features">
+                <li>Stability tuning across core services</li>
+                <li>Extended monitoring for system health</li>
+                <li>Security hardening and patch rollup</li>
+              </ul>
+            </div>
 
-            <p style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              Click below to update now!
-            </p>
+            <p className="note">Press ENTER or use the control below to continue with the update.</p>
           </div>
 
           <div className="dialog-footer">
             <button className="update-btn" onClick={onUpdate}>
-              Update Now
+              Begin update
             </button>
           </div>
         </div>
