@@ -66,6 +66,26 @@ export default function AlinaOSBoot({
 
   const currentTheme = themes[theme] || themes.light;
 
+  const versionLabel = theme === 'dark' ? 'Initialising OS' : `v${version}`;
+
+  const bootMessages = theme === 'dark'
+    ? [
+        `> Installed build: v${version}`,
+        '> Initialising core services...',
+        '> Loading critical subsystems...',
+        '> Verifying system integrity... OK',
+        '> Awaiting your cue... press Enter to continue.'
+      ]
+    : [
+        '> INITIALIZING BIRTHDAY SYSTEM...',
+        '> LOADING SPARKLE MODULES...',
+        '> CHECKING CELEBRATION LEVELS... OK',
+        '> PREPARING SPECIAL SURPRISES...',
+        '> SYSTEM READY FOR FUN!'
+      ];
+
+  const taglineText = theme === 'dark' ? null : 'A lavender night made just for you';
+
   return (
     <>
       <style>{`
@@ -423,25 +443,27 @@ export default function AlinaOSBoot({
             <div className="logo logo-white">AlinaOS</div>
           </div>
 
-          <div className="version">v{version}</div>
+          <div className="version">{versionLabel}</div>
 
           <div className="boot-messages">
-            <div>&gt; INITIALIZING BIRTHDAY SYSTEM...</div>
-            <div>&gt; LOADING SPARKLE MODULES...</div>
-            <div>&gt; CHECKING CELEBRATION LEVELS... OK</div>
-            <div>&gt; PREPARING SPECIAL SURPRISES...</div>
-            <div>&gt; SYSTEM READY FOR FUN!</div>
+            {bootMessages.map((message, index) => (
+              <div key={message} style={{ animationDelay: `${1 + index * 0.2}s` }}>
+                {message}
+              </div>
+            ))}
           </div>
 
           <div className="divider"></div>
 
           <div className="prompt-section">
-            <div className="tagline">{theme === 'dark' ? 'System ready for update' : 'A lavender night made just for you'}</div>
+            {taglineText && (
+              <div className="tagline">{taglineText}</div>
+            )}
             <div className="prompt">
-              PRESS ENTER TO CONTINUE<span className="cursor">_</span>
+              Press ENTER to continue<span className="cursor">_</span>
             </div>
             <button className="enter-btn" onClick={enterSystem}>
-              START
+              {theme === 'dark' ? 'Continue' : 'Start'}
             </button>
           </div>
         </div>
