@@ -892,8 +892,9 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
       analyser.getByteFrequencyData(dataArray)
 
       // Draw traditional waveform
-      const barCount = 64
+      const barCount = 80
       const barWidth = width / barCount
+      const barGap = 1
       const maxBarHeight = height / 2 - 10
 
       // Draw bars mirrored from center
@@ -903,6 +904,7 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
         const barHeight = value * maxBarHeight
 
         const x = i * barWidth
+        const actualBarWidth = barWidth - barGap
 
         // Create gradient for each bar
         const topGradient = ctx.createLinearGradient(x, centerY - barHeight, x, centerY)
@@ -917,11 +919,11 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
 
         // Draw top half (above center)
         ctx.fillStyle = topGradient
-        ctx.fillRect(x + 1, centerY - barHeight, barWidth - 2, barHeight)
+        ctx.fillRect(x, centerY - barHeight, actualBarWidth, barHeight)
 
         // Draw bottom half (below center)
         ctx.fillStyle = bottomGradient
-        ctx.fillRect(x + 1, centerY, barWidth - 2, barHeight)
+        ctx.fillRect(x, centerY, actualBarWidth, barHeight)
       }
 
       // Draw subtle center line
@@ -1025,10 +1027,11 @@ function MusicContent({ player }) {
         </div>
         <div className="space-y-2">
           <div
-            className="relative h-3 w-full cursor-pointer overflow-hidden rounded-full border-2"
+            className="relative h-5 w-full cursor-pointer overflow-visible rounded-full border-2"
             style={{
               borderColor: PALETTE.secondary,
               backgroundColor: '#cfefff',
+              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
             }}
             onClick={handleSeek}
           >
@@ -1036,7 +1039,18 @@ function MusicContent({ player }) {
               className="absolute inset-y-0 left-0 rounded-full"
               style={{
                 width: `${progressPercent}%`,
-                background: `linear-gradient(90deg, ${PALETTE.secondary}, ${PALETTE.accent})`,
+                background: `linear-gradient(90deg, ${PALETTE.secondary}, ${PALETTE.primary})`,
+                boxShadow: '0 2px 6px rgba(124, 210, 255, 0.5)',
+              }}
+            />
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 transition-transform hover:scale-125"
+              style={{
+                left: `${progressPercent}%`,
+                marginLeft: '-8px',
+                backgroundColor: PALETTE.primary,
+                borderColor: PALETTE.border,
+                boxShadow: '0 2px 8px rgba(255, 159, 207, 0.6)',
               }}
             />
           </div>
