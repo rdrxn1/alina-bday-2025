@@ -4,6 +4,20 @@ import bachpanSrc from '../assets/music/Bachpan.mp3'
 import noSurprisesSrc from '../assets/music/No Surprises.mp3'
 import nindiyaReSrc from '../assets/music/Nindiya Re Studio Version.mp3'
 import baatUnkahiSrc from '../assets/music/Baat Unkahi.mp3'
+import apocalypseSrc from '../assets/music/Cigarettes After Sex - Apocalypse.mp3'
+import crySrc from '../assets/music/Cigarettes After Sex - Cry.mp3'
+import eachTimeSrc from '../assets/music/Cigarettes After Sex - Each Time You Fall in Love.mp3'
+import fallingInLoveSrc from '../assets/music/Cigarettes After Sex - Falling In Love.mp3'
+import heavenlySrc from '../assets/music/Cigarettes After Sex - Heavenly.mp3'
+import kSrc from '../assets/music/Cigarettes After Sex - K..mp3'
+import nothingsGonnaSrc from '../assets/music/Cigarettes After Sex - Nothing_s Gonna Hurt You Baby.mp3'
+import sunsetzSrc from '../assets/music/Cigarettes After Sex - Sunsetz.mp3'
+import instantCrushSrc from '../assets/music/Daft Punk Julian Casablancas - Instant Crush feat. Julian Casablancas.mp3'
+import faasleSrc from '../assets/music/Kaavish - Faasle Studio Version.mp3'
+import terePyarSrc from '../assets/music/Kaavish - Tere Pyar Main.mp3'
+import daydreamingSrc from '../assets/music/Radiohead - Daydreaming.mp3'
+import fakePlasticSrc from '../assets/music/Radiohead - Fake Plastic Trees.mp3'
+import motionPictureSrc from '../assets/music/Radiohead - Motion Picture Soundtrack.mp3'
 
 const PALETTE = Object.freeze({
   bg: '#ffe6f2',
@@ -70,7 +84,7 @@ const WINDOW_META = {
   },
   music: {
     title: 'FAVORITE_MUSIC.APP',
-    width: 300,
+    width: 400,
     colors: {
       border: PALETTE.secondary,
       background: '#e6f6ff',
@@ -182,6 +196,104 @@ const TRACKS = Object.freeze([
     artist: 'Kaavish',
     src: baatUnkahiSrc,
     display: 'Baat Unkahi - Kaavish',
+  },
+  {
+    id: 'apocalypse',
+    title: 'Apocalypse',
+    artist: 'Cigarettes After Sex',
+    src: apocalypseSrc,
+    display: 'Apocalypse - Cigarettes After Sex',
+  },
+  {
+    id: 'cry',
+    title: 'Cry',
+    artist: 'Cigarettes After Sex',
+    src: crySrc,
+    display: 'Cry - Cigarettes After Sex',
+  },
+  {
+    id: 'each-time',
+    title: 'Each Time You Fall in Love',
+    artist: 'Cigarettes After Sex',
+    src: eachTimeSrc,
+    display: 'Each Time You Fall in Love - Cigarettes After Sex',
+  },
+  {
+    id: 'falling-in-love',
+    title: 'Falling In Love',
+    artist: 'Cigarettes After Sex',
+    src: fallingInLoveSrc,
+    display: 'Falling In Love - Cigarettes After Sex',
+  },
+  {
+    id: 'heavenly',
+    title: 'Heavenly',
+    artist: 'Cigarettes After Sex',
+    src: heavenlySrc,
+    display: 'Heavenly - Cigarettes After Sex',
+  },
+  {
+    id: 'k',
+    title: 'K.',
+    artist: 'Cigarettes After Sex',
+    src: kSrc,
+    display: 'K. - Cigarettes After Sex',
+  },
+  {
+    id: 'nothings-gonna',
+    title: "Nothing's Gonna Hurt You Baby",
+    artist: 'Cigarettes After Sex',
+    src: nothingsGonnaSrc,
+    display: "Nothing's Gonna Hurt You Baby - Cigarettes After Sex",
+  },
+  {
+    id: 'sunsetz',
+    title: 'Sunsetz',
+    artist: 'Cigarettes After Sex',
+    src: sunsetzSrc,
+    display: 'Sunsetz - Cigarettes After Sex',
+  },
+  {
+    id: 'instant-crush',
+    title: 'Instant Crush',
+    artist: 'Daft Punk feat. Julian Casablancas',
+    src: instantCrushSrc,
+    display: 'Instant Crush - Daft Punk feat. Julian Casablancas',
+  },
+  {
+    id: 'faasle',
+    title: 'Faasle (Studio)',
+    artist: 'Kaavish',
+    src: faasleSrc,
+    display: 'Faasle (Studio Version) - Kaavish',
+  },
+  {
+    id: 'tere-pyar',
+    title: 'Tere Pyar Main',
+    artist: 'Kaavish',
+    src: terePyarSrc,
+    display: 'Tere Pyar Main - Kaavish',
+  },
+  {
+    id: 'daydreaming',
+    title: 'Daydreaming',
+    artist: 'Radiohead',
+    src: daydreamingSrc,
+    display: 'Daydreaming - Radiohead',
+  },
+  {
+    id: 'fake-plastic',
+    title: 'Fake Plastic Trees',
+    artist: 'Radiohead',
+    src: fakePlasticSrc,
+    display: 'Fake Plastic Trees - Radiohead',
+  },
+  {
+    id: 'motion-picture',
+    title: 'Motion Picture Soundtrack',
+    artist: 'Radiohead',
+    src: motionPictureSrc,
+    display: 'Motion Picture Soundtrack - Radiohead',
   },
 ])
 
@@ -422,10 +534,10 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  music: { x: 90, y: 70, width: 300, height: 410, zIndex: 4, status: 'open', maximized: false },
-  chat: { x: 410, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
+  music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
+  chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
-  photos: { x: 540, y: 190, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
+  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
 }
 
 function Y2KBirthdayDesktop() {
