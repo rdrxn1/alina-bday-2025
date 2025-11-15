@@ -578,7 +578,7 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'closed', maximized: false },
+  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'open', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
   chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
@@ -793,7 +793,6 @@ function Y2KBirthdayDesktop() {
             icon={<MailIcon {...ICON_STYLES.email.icon} />}
             label="EMAIL"
             colors={ICON_STYLES.email}
-            badge={mailUnread ? '1' : null}
             onClick={() => handleIconClick('email')}
           />
           <DesktopIcon
@@ -835,10 +834,6 @@ function Y2KBirthdayDesktop() {
           >
             <EmailContent />
           </Window>
-        )}
-
-        {mailUnread && mailAlertVisible && (
-          <MailNotification onDismiss={() => setMailAlertVisible(false)} />
         )}
 
         {windows.chat.status === 'open' && (
