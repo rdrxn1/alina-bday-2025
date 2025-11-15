@@ -7,6 +7,7 @@ import SongsWindow from './windows/SongsWindow'
 import MomentsWindow from './windows/MomentsWindow'
 import BirthdayWindow from './windows/BirthdayWindow'
 import ForYouWindow from './windows/ForYouWindow'
+import EmailWindow from './windows/EmailWindow'
 
 const WINDOW_COMPONENTS = {
   memories: MemoriesWindow,
@@ -15,6 +16,7 @@ const WINDOW_COMPONENTS = {
   moments: MomentsWindow,
   birthday: BirthdayWindow,
   forYou: ForYouWindow,
+  email: EmailWindow,
 }
 
 function DesktopWindowManager() {
