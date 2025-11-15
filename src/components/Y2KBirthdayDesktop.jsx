@@ -590,9 +590,28 @@ function Y2KBirthdayDesktop() {
   const [dragState, setDragState] = useState(null)
   const [resizeState, setResizeState] = useState(null)
   const [startOpen, setStartOpen] = useState(false)
+  const [mailUnread, setMailUnread] = useState(true)
+  const [mailAlertVisible, setMailAlertVisible] = useState(true)
   const containerRef = useRef(null)
   const musicPlayer = useDesktopMusicPlayer(TRACKS)
   const { stop: stopMusic } = musicPlayer
+
+  useEffect(() => {
+    if (!mailUnread) {
+      setMailAlertVisible(false)
+      return
+    }
+
+    if (!mailAlertVisible) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setMailAlertVisible(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [mailUnread, mailAlertVisible])
 
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
@@ -728,11 +747,15 @@ function Y2KBirthdayDesktop() {
 
   const handleRestore = useCallback((key) => {
     setStartOpen(false)
+    if (key === 'email') {
+      setMailUnread(false)
+      setMailAlertVisible(false)
+    }
     setWindows(prev => {
       const maxZ = Math.max(...Object.values(prev).map(w => w.zIndex))
       return { ...prev, [key]: { ...prev[key], status: 'open', maximized: false, zIndex: maxZ + 1 } }
     })
-  }, [])
+  }, [setMailAlertVisible, setMailUnread])
 
   const handleIconClick = useCallback((key) => {
     handleRestore(key)
@@ -1583,7 +1606,36 @@ function PhotosContent() {
   )
 }
 
-function DesktopIcon({ icon, label, onClick, colors }) {
+function MailNotification({ onDismiss }) {
+  return (
+    <div
+      className="absolute right-12 bottom-24 flex max-w-xs cursor-pointer flex-col gap-2 rounded-xl border-4 px-5 py-4 shadow-lg"
+      style={{
+        backgroundColor: PALETTE.windowBg,
+        borderColor: WINDOW_META.email.colors.border,
+        color: PALETTE.text,
+        boxShadow: '0 18px 30px rgba(60, 98, 83, 0.22)',
+      }}
+      onClick={onDismiss}
+    >
+      <div className="flex items-center gap-3 text-sm font-semibold tracking-wide">
+        <MailIcon {...ICON_STYLES.email.icon} />
+        YOU'VE GOT MAIL!
+      </div>
+      <div className="text-xs font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
+        Click the EMAIL icon to read your birthday message.
+      </div>
+      <div
+        className="self-end text-[10px] font-semibold tracking-[0.35em]"
+        style={{ color: WINDOW_META.email.colors.border }}
+      >
+        TAP TO DISMISS
+      </div>
+    </div>
+  )
+}
+
+function DesktopIcon({ icon, label, onClick, colors, badge }) {
   const palette = colors ?? {
     tileBg: PALETTE.accent,
     tileBorder: PALETTE.border,
@@ -1597,7 +1649,7 @@ function DesktopIcon({ icon, label, onClick, colors }) {
       onClick={onClick}
     >
       <div
-        className="w-14 h-14 flex items-center justify-center border-3"
+        className="relative flex h-14 w-14 items-center justify-center border-3"
         style={{
           backgroundColor: palette.tileBg,
           border: `3px solid ${palette.tileBorder}`,
@@ -1605,6 +1657,19 @@ function DesktopIcon({ icon, label, onClick, colors }) {
         }}
       >
         {icon}
+        {badge && (
+          <span
+            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold"
+            style={{
+              backgroundColor: WINDOW_META.email.colors.titleBar,
+              borderColor: WINDOW_META.email.colors.border,
+              color: PALETTE.text,
+              boxShadow: '0 6px 12px rgba(60, 98, 83, 0.35)',
+            }}
+          >
+            {badge}
+          </span>
+        )}
       </div>
       <div
         className="text-sm font-semibold text-center px-3 py-1 tracking-wide"
