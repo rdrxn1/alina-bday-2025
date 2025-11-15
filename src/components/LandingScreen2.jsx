@@ -185,13 +185,33 @@ export default function AlinaOSBoot({
 
         .version {
           font-family: 'VT323', monospace;
-          font-size: 2rem;
+          font-size: 3.5rem;
+          font-weight: 700;
           color: ${currentTheme.versionColor};
-          letter-spacing: 0.1em;
+          letter-spacing: 0.2em;
           margin-top: -2rem;
           opacity: 0;
-          animation: fadeIn 0.6s ease-out forwards;
+          animation: fadeInGlow 0.6s ease-out forwards;
           animation-delay: 0.6s;
+          text-shadow:
+            0 0 20px ${currentTheme.versionColor},
+            0 0 40px ${currentTheme.versionColor},
+            0 0 60px ${currentTheme.versionColor};
+        }
+
+        @keyframes fadeInGlow {
+          0% {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          60% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
 
         @keyframes fadeIn {
@@ -337,7 +357,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.5rem;
+            font-size: 2.5rem;
           }
 
           .boot-messages {
@@ -370,7 +390,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.2rem;
+            font-size: 2rem;
           }
 
           .boot-messages {
@@ -408,7 +428,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.3rem;
+            font-size: 2.2rem;
             margin-top: -1rem;
           }
 
