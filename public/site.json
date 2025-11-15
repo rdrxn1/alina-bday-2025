@@ -160,6 +160,19 @@
         "message": "Everything beautiful I've ever seen reminds me of you.",
         "closing": "From Waleed - always."
       }
+    },
+    {
+      "id": "email",
+      "label": "Email",
+      "emoji": "📧",
+      "variant": "email",
+      "windowTitle": "Inbox",
+      "hasNotification": true,
+      "notificationCount": 1,
+      "content": {
+        "subject": "Welcome to Your Birthday Site",
+        "message": "Hey Alina,\n\nI wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.\n\nEvery year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.\n\nInside, you'll find:\n🌷 Memories - moments that live rent-free in my heart\n💌 Messages - journal entries about you, for you\n🎧 Songs - the soundtrack to our story\n📸 Moments - your favorite things (because you deserve them all)\n🎂 Birthday - a little ritual just for today\n🕊️ For You - because everything beautiful reminds me of you\n\nThis is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.\n\nI hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.\n\nHappy birthday, my love. Here's to another year of us."
+      }
     }
   ]
 }

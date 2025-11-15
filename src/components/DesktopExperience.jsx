@@ -58,9 +58,33 @@ function DesktopExperience() {
     )
   }
 
+  const hasEmailNotification = icons.some(icon => icon.id === 'email' && icon.hasNotification)
+
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
       <BackgroundLayers />
+
+      {/* Top Right Notification */}
+      {hasEmailNotification && (
+        <motion.div
+          initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.8, type: 'spring', stiffness: 200, damping: 20 }}
+          className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-xl border border-desktop-mint/30 bg-gradient-to-br from-[#2b2554]/95 to-[#1a1534]/95 px-5 py-3 shadow-[0_8px_24px_rgba(126,250,234,0.25)] backdrop-blur-sm"
+        >
+          <motion.span
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+            className="text-2xl"
+          >
+            📧
+          </motion.span>
+          <div>
+            <p className="font-pixel text-[9px] uppercase tracking-[0.35em] text-desktop-mint">New Mail</p>
+            <p className="mt-1 font-terminal text-sm text-white/90">You've got mail!</p>
+          </div>
+        </motion.div>
+      )}
 
       <div className="relative z-10 flex min-h-screen flex-col">
         <main className="flex-1 px-6 py-8 sm:px-10 sm:py-12">
