@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import LandingScreen2 from './components/LandingScreen2'
 import UpdatePopup from './components/UpdatePopup'
 import UpdateProgress from './components/UpdateProgress'
-import Y2KBirthdayDesktop from './components/Y2KBirthdayDesktop'
+import DesktopExperience from './components/DesktopExperience'
 
 function App() {
   // State machine: v24 -> updatePopup -> updating -> v25 -> desktop
@@ -61,7 +61,7 @@ function App() {
   }
 
   // Stage 5: Main desktop experience
-  return <Y2KBirthdayDesktop />
+  return <DesktopExperience />
 }
 
 export default App
