@@ -76,20 +76,18 @@ export default function UpdatePopup({ onUpdate }) {
         .version-strip {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          font-size: 2.2rem;
+          gap: 0.75rem;
+          font-size: 1.6rem;
           color: #ff9b9b;
         }
 
         .version-pill {
-          padding: 0.6rem 2rem;
+          padding: 0.35rem 1.4rem;
           border-radius: 999px;
-          border: 2px solid rgba(255, 102, 102, 0.6);
+          border: 1px solid rgba(255, 102, 102, 0.6);
           background: rgba(255, 51, 51, 0.12);
-          letter-spacing: 0.15em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          font-weight: 700;
-          font-size: 2.2rem;
         }
 
         .version-pill--old {
@@ -99,35 +97,13 @@ export default function UpdatePopup({ onUpdate }) {
         .version-pill--new {
           color: #ffffff;
           border-color: rgba(255, 51, 51, 0.9);
-          background: rgba(255, 51, 51, 0.3);
-          box-shadow:
-            0 0 25px rgba(255, 51, 51, 0.7),
-            0 0 50px rgba(255, 51, 51, 0.5),
-            0 4px 15px rgba(255, 51, 51, 0.6);
-          animation: versionPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes versionPulse {
-          0%, 100% {
-            transform: scale(1);
-            box-shadow:
-              0 0 25px rgba(255, 51, 51, 0.7),
-              0 0 50px rgba(255, 51, 51, 0.5),
-              0 4px 15px rgba(255, 51, 51, 0.6);
-          }
-          50% {
-            transform: scale(1.05);
-            box-shadow:
-              0 0 35px rgba(255, 51, 51, 0.9),
-              0 0 70px rgba(255, 51, 51, 0.7),
-              0 4px 20px rgba(255, 51, 51, 0.8);
-          }
+          background: rgba(255, 51, 51, 0.24);
+          box-shadow: 0 0 16px rgba(255, 51, 51, 0.5);
         }
 
         .version-arrow {
           color: #ff4d4d;
-          font-size: 2.5rem;
-          font-weight: 700;
+          font-size: 1.8rem;
         }
 
         .dialog-body {
@@ -167,10 +143,8 @@ export default function UpdatePopup({ onUpdate }) {
         }
 
         .detail-value {
-          font-size: 2rem;
-          font-weight: 700;
+          font-size: 1.6rem;
           color: #ffffff;
-          text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .features-heading {

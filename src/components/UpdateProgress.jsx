@@ -87,47 +87,13 @@ export default function UpdateProgress({ onComplete }) {
         }
 
         .update-title {
-          font-size: 3.5rem;
-          font-weight: 700;
+          font-size: 3rem;
           color: #ff3333;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
-          margin-bottom: 1.5rem;
+          letter-spacing: 0.15em;
+          margin-bottom: 3rem;
           text-align: center;
           animation: pulse 2s infinite;
-          text-shadow:
-            0 0 20px rgba(255, 51, 51, 0.8),
-            0 0 40px rgba(255, 51, 51, 0.6);
-        }
-
-        .version-badge {
-          font-size: 2.5rem;
-          color: #ffffff;
-          text-align: center;
-          margin-bottom: 3rem;
-          padding: 0.5rem 2rem;
-          background: rgba(255, 51, 51, 0.2);
-          border: 2px solid #ff3333;
-          border-radius: 999px;
-          display: inline-block;
-          letter-spacing: 0.15em;
-          box-shadow:
-            0 0 30px rgba(255, 51, 51, 0.6),
-            0 4px 15px rgba(255, 51, 51, 0.4);
-          animation: versionGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes versionGlow {
-          0%, 100% {
-            box-shadow:
-              0 0 30px rgba(255, 51, 51, 0.6),
-              0 4px 15px rgba(255, 51, 51, 0.4);
-          }
-          50% {
-            box-shadow:
-              0 0 45px rgba(255, 51, 51, 0.9),
-              0 4px 20px rgba(255, 51, 51, 0.6);
-          }
         }
 
         @keyframes pulse {
@@ -232,10 +198,6 @@ export default function UpdateProgress({ onComplete }) {
         /* Responsive */
         @media (max-width: 600px) {
           .update-title {
-            font-size: 2.2rem;
-          }
-
-          .version-badge {
             font-size: 2rem;
           }
 
@@ -263,7 +225,6 @@ export default function UpdateProgress({ onComplete }) {
         <div className="update-spinner"></div>
 
         <div className="update-title">Updating AlinaOS</div>
-        <div className="version-badge">v25.0</div>
 
         <div className="progress-section">
           <div className="progress-bar-container">
