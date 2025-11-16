@@ -1,9 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 
 function SongsWindow({ description, cassettes = [] }) {
-  const defaultCassette = useMemo(() => cassettes[0]?.id ?? null, [cassettes])
-  const [activeId, setActiveId] = useState(defaultCassette)
+  const defaultCassetteId = useMemo(() => cassettes[0]?.id ?? null, [cassettes])
+  const [activeId, setActiveId] = useState(defaultCassetteId)
+
+  useEffect(() => {
+    if (!defaultCassetteId) return
+
+    const hasActiveCassette = cassettes.some((cassette) => cassette.id === activeId)
+    if (!hasActiveCassette) {
+      setActiveId(defaultCassetteId)
+    }
+  }, [activeId, cassettes, defaultCassetteId])
 
   const activeCassette = useMemo(
     () => cassettes.find((cassette) => cassette.id === activeId) ?? null,
