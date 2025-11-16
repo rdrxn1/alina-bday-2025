@@ -585,8 +585,11 @@ const INITIAL_WINDOWS = {
   photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
 }
 
+const createInitialWindowsState = () =>
+  Object.fromEntries(Object.entries(INITIAL_WINDOWS).map(([key, value]) => [key, { ...value }]))
+
 function Y2KBirthdayDesktop() {
-  const [windows, setWindows] = useState(INITIAL_WINDOWS)
+  const [windows, setWindows] = useState(() => createInitialWindowsState())
   const [dragState, setDragState] = useState(null)
   const [resizeState, setResizeState] = useState(null)
   const [startOpen, setStartOpen] = useState(false)
