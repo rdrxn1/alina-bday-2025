@@ -72,16 +72,6 @@ const SCROLLBAR_STYLES = `
 `
 
 const WINDOW_META = {
-  chat: {
-    title: 'MY_COOL_CHAT.EXE',
-    width: 340,
-    colors: {
-      border: PALETTE.lavender,
-      background: '#f1ecff',
-      titleBar: PALETTE.lavender,
-    },
-    taskLabel: 'Chat',
-  },
   music: {
     title: 'FAVORITE_MUSIC.APP',
     width: 400,
@@ -134,17 +124,6 @@ const ICON_STYLES = Object.freeze({
       main: WINDOW_META.music.colors.titleBar,
       accent: '#ffffff',
       detail: '#2b4d66',
-    },
-  },
-  chat: {
-    tileBg: WINDOW_META.chat.colors.titleBar,
-    tileBorder: WINDOW_META.chat.colors.border,
-    labelBg: '#f6f2ff',
-    labelBorder: WINDOW_META.chat.colors.border,
-    icon: {
-      main: WINDOW_META.chat.colors.titleBar,
-      accent: '#ffffff',
-      detail: '#4a3c6d',
     },
   },
   about: {
@@ -578,11 +557,10 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'open', maximized: false },
-  music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
-  chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
-  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
-  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
+  email: { x: 540, y: 320, width: 720, height: 820, zIndex: 5, status: 'open', maximized: false },
+  music: { x: 550, y: 40, width: 500, height: 570, zIndex: 4, status: 'open', maximized: false },
+  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
+  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 2, status: 'open', maximized: false },
 }
 
 const createInitialWindowsState = () =>
@@ -805,12 +783,6 @@ function Y2KBirthdayDesktop() {
             onClick={() => handleIconClick('music')}
           />
           <DesktopIcon
-            icon={<ChatIcon {...ICON_STYLES.chat.icon} />}
-            label="CHAT"
-            colors={ICON_STYLES.chat}
-            onClick={() => handleIconClick('chat')}
-          />
-          <DesktopIcon
             icon={<FileIcon {...ICON_STYLES.about.icon} />}
             label="ABOUT"
             colors={ICON_STYLES.about}
@@ -841,17 +813,24 @@ function Y2KBirthdayDesktop() {
 
         {windows.chat.status === 'open' && (
           <Window
-            windowKey="chat"
-            data={windows.chat}
-            meta={WINDOW_META.chat}
+            windowKey="email"
+            data={windows.email}
+            meta={WINDOW_META.email}
             onMouseDown={handleWindowMouseDown}
             onResizeStart={handleResizeMouseDown}
             onMinimize={handleMinimize}
             onMaximize={handleMaximize}
             onClose={handleClose}
           >
-            <ChatContent />
+            <EmailContent />
           </Window>
+        )}
+
+        {mailUnread && mailAlertVisible && (
+          <MailNotification
+            onDismiss={() => setMailAlertVisible(false)}
+            onOpen={() => handleIconClick('email')}
+          />
         )}
 
         {windows.music.status === 'open' && (
@@ -1116,52 +1095,111 @@ function EmailContent() {
 
 function ChatContent() {
   return (
-    <div className="p-4 space-y-3 text-sm">
+    <div className="flex h-full flex-col gap-5 p-5" style={{ color: PALETTE.text }}>
       <div
-        className="h-40 overflow-y-auto p-3 text-sm font-mono custom-scroll"
+        className="flex items-center justify-between gap-4 rounded-2xl border-2 px-5 py-4"
         style={{
-          border: `2px solid ${PALETTE.lavender}`,
-          backgroundColor: '#f1e9ff',
+          backgroundColor: '#f7f3ff',
+          borderColor: WINDOW_META.email.colors.border,
+          boxShadow: '0 14px 28px rgba(122, 102, 180, 0.25)',
         }}
       >
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Hey! Happy birthday!!</span>
+        <div className="flex items-center gap-4">
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-xl border-2"
+            style={{
+              backgroundColor: WINDOW_META.email.colors.titleBar,
+              borderColor: WINDOW_META.email.colors.border,
+            }}
+          >
+            <MailIcon {...ICON_STYLES.email.icon} />
+          </div>
+          <div className="text-sm font-mono leading-tight">
+            <div className="text-xs font-bold uppercase tracking-[0.4em]" style={{ color: PALETTE.textLight }}>
+              From: Waleed
+            </div>
+            <div className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+              Subject: {EMAIL_CONTENT.subject}
+            </div>
+          </div>
         </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Thanks so much!</span>
-        </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Tonight's desktop is all yours.</span>
-        </div>
-        <div>
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Then play me Kaavish and tell me a secret.</span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-1 px-3 py-2 text-sm border-2 focus:outline-none"
+        <div
+          className="rounded-full border-2 px-4 py-1 text-[13px] font-bold uppercase tracking-[0.35em]"
           style={{
-            borderColor: PALETTE.accent,
-            backgroundColor: PALETTE.bg,
-            color: PALETTE.text,
-          }}
-        />
-        <button
-          className="px-4 py-2 text-sm font-bold border-2 transition-opacity hover:opacity-80"
-          style={{
-            backgroundColor: PALETTE.accent,
-            borderColor: PALETTE.border,
+            backgroundColor: '#ffffff',
+            borderColor: WINDOW_META.email.colors.border,
             color: PALETTE.text,
           }}
         >
-          SEND
-        </button>
+          Inbox
+        </div>
+      </div>
+
+      <div
+        className="flex-1 space-y-6 overflow-y-auto rounded-3xl border-2 p-6 custom-scroll"
+        style={{
+          borderColor: WINDOW_META.email.colors.border,
+          background: 'linear-gradient(180deg, #ffffff 0%, #f3edff 100%)',
+          boxShadow: '0 22px 48px rgba(90, 61, 122, 0.16)',
+        }}
+      >
+        {blocks.map((block, blockIndex) => {
+          const lines = block.split('\n').filter(Boolean)
+          if (lines.length === 0) {
+            return null
+          }
+
+          const hasList =
+            lines.length > 1 &&
+            lines.slice(1).every((line) => bulletPrefixes.some((prefix) => line.trim().startsWith(prefix)))
+
+          if (hasList) {
+            return (
+              <div key={blockIndex} className="space-y-3">
+                <p className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+                  {lines[0]}
+                </p>
+                <ul className="space-y-2 text-base font-mono" style={{ color: PALETTE.text }}>
+                  {lines.slice(1).map((line, index) => {
+                    const trimmed = line.trim()
+                    const firstSpace = trimmed.indexOf(' ')
+                    const icon = firstSpace >= 0 ? trimmed.slice(0, firstSpace) : trimmed
+                    const text = firstSpace >= 0 ? trimmed.slice(firstSpace + 1).trim() : ''
+                    return (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-xl leading-none">{icon}</span>
+                        <span className="flex-1 text-lg leading-relaxed">{text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          }
+
+          return (
+            <p key={blockIndex} className="text-lg leading-relaxed" style={{ color: PALETTE.text }}>
+              {lines.map((line, lineIndex) => (
+                <span key={lineIndex}>
+                  {line}
+                  {lineIndex < lines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          )
+        })}
+
+        <div className="rounded-2xl border-2 px-5 py-4 text-base" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
+          <div className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+            With all my love,
+          </div>
+          <div className="text-2xl font-bold" style={{ color: PALETTE.text }}>
+            Waleed
+          </div>
+          <div className="text-[11px] uppercase tracking-[0.45em]" style={{ color: PALETTE.textLight }}>
+            November 2025
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -1970,20 +2008,21 @@ function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.te
 function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <path d="M9 18V5L21 3V16" stroke={detail} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"/>
-      <rect x="3" y="15" width="6" height="6" stroke={detail} strokeWidth="2" fill={main}/>
-      <rect x="15" y="13" width="6" height="6" stroke={detail} strokeWidth="2" fill={accent}/>
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={detail} strokeWidth="2" fill={main} />
+      <path d="M4 6L12 13L20 6" stroke={detail} strokeWidth="2" fill="none" />
+      <path d="M4 19L10.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <path d="M20 19L13.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <rect x="7" y="8" width="10" height="3" fill={accent} stroke={detail} strokeWidth="1" />
     </svg>
   )
 }
 
-function ChatIcon({ main = PALETTE.accent, accent = PALETTE.lavender, detail = PALETTE.text }) {
+function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="18" height="14" stroke={detail} strokeWidth="2" fill={main}/>
-      <path d="M3 17L7 21V17H3Z" stroke={detail} strokeWidth="2" fill={accent}/>
-      <line x1="7" y1="8" x2="17" y2="8" stroke={detail} strokeWidth="2"/>
-      <line x1="7" y1="12" x2="14" y2="12" stroke={detail} strokeWidth="2"/>
+      <path d="M9 18V5L21 3V16" stroke={detail} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"/>
+      <rect x="3" y="15" width="6" height="6" stroke={detail} strokeWidth="2" fill={main}/>
+      <rect x="15" y="13" width="6" height="6" stroke={detail} strokeWidth="2" fill={accent}/>
     </svg>
   )
 }
