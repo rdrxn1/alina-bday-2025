@@ -1,30 +1,30 @@
 {
   "pages": [
     {
-      "id": "sunrise",
-      "title": "Sunrise playlist",
+      "id": "januarydate",
+      "title": "January Date",
       "showTitle": true,
       "caption": "Snapshots of slow mornings and sleepy smiles.",
       "entries": [
         {
           "type": "text",
-          "content": "Every day deserves its own mini photo spread. Use this JSON file to organize the stories you want to tell."
+          "content": "The funnest date we've had."
         },
         {
           "type": "image",
-          "file": "placeholder-aurora.svg",
-          "alt": "Gradient placeholder image"
+          "file": "january_date_1.JPG",
+          "alt": "January Date 1"
         },
         {
           "type": "image",
-          "file": "placeholder-lavender.svg",
-          "alt": "Lavender placeholder image"
+          "file": "january_date_2.JPG",
+          "alt": "January Date 2"
         }
       ]
     },
     {
-      "id": "stargazing",
-      "title": "",
+      "id": "soulfest",
+      "title": "Soulfest",
       "showTitle": false,
       "caption": "Add as many files as you want for a single page—the layout grows with you.",
       "entries": [
@@ -39,5 +39,80 @@
         }
       ]
     }
+        {
+      "id": "anniversary",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
+                   {
+      "id": "friends_date",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
+            {
+      "id": "skardu",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
+            {
+      "id": "makeupdate",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
+            {
+      "id": "birthday",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
   ]
 }

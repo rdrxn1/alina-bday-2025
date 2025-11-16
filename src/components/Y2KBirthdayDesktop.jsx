@@ -329,24 +329,13 @@ const TRACKS = Object.freeze([
 ])
 
 const EMAIL_CONTENT = Object.freeze({
-  subject: 'Welcome to Your Birthday Site',
-  message: `Hey Alina,
+  subject: 'Welcome to Your Site',
+  message: `Hi baby,
+It might not look like much. But I've worked really long and hard on this. I wanted to create an experience to mark your day, and to celebrate you. Unfortunately it took ages for me to finish it. But to me, this is something special, and I hope that 
+it is for you as well. Welcome to YOUR site. This is an experience built for you, to celebrate you. it's a place that has all your favourite songs (or some of them for now haha), our favourite memories and anything else we could want. It's a living, breathing 
+thing that we can build on every year, and keep the previous iteration as a time capsule! Every year the OS gets updated - pretty cool rigtht?
 
-I wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.
-
-Every year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.
-
-Inside, you'll find:
-🌷 Memories - moments that live rent-free in my heart
-💌 Messages - journal entries about you, for you
-🎧 Songs - the soundtrack to our story
-📸 Moments - your favorite things (because you deserve them all)
-🎂 Birthday - a little ritual just for today
-🕊️ For You - because everything beautiful reminds me of you
-
-This is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.
-
-I hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.
+This is a teeny tiny gift for you, baby. I hope this brings you a little joy. You deserve all the happiness the world can offer. 
 
 Happy birthday, my love. Here's to another year of us.`,
 })
@@ -1718,6 +1707,153 @@ function PhotoEntry({ entry }) {
   return (
     <figure className="overflow-hidden rounded-xl border-2" style={{ borderColor: PALETTE.border }}>
       <img src={src} alt={entry.alt ?? 'Memory photo'} className="h-full w-full object-cover" />
+    </figure>
+  )
+}
+
+function FlowersContent() {
+  const bouquets = flowerPages?.bouquets ?? []
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  if (!bouquets.length) {
+    return (
+      <div
+        className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center font-mono text-xs"
+        style={{ color: PALETTE.text }}
+      >
+        <p className="text-sm font-semibold uppercase tracking-[0.3em]">NO BOUQUETS FOUND</p>
+        <p className="max-w-xs text-[13px] text-rose-900/70">
+          Add entries to <code className="rounded bg-white/80 px-2 py-0.5">src/data/flowerPages.json</code> and drop matching
+          files into <code className="rounded bg-white/80 px-2 py-0.5">src/assets/flowers</code>.
+        </p>
+      </div>
+    )
+  }
+
+  const safeIndex = Math.min(Math.max(currentIndex, 0), bouquets.length - 1)
+  const activeSpread = bouquets[safeIndex]
+  const { title, caption, entries = [], showTitle = true } = activeSpread
+
+  const movePage = (direction) => {
+    setCurrentIndex((prev) => {
+      const next = prev + direction
+      if (next < 0) return 0
+      if (next > bouquets.length - 1) return bouquets.length - 1
+      return next
+    })
+  }
+
+  return (
+    <div
+      className="flex h-full flex-col gap-4 p-5 font-mono"
+      style={{
+        color: PALETTE.text,
+        backgroundColor: '#fff0f7',
+      }}
+    >
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.45em]" style={{ color: PALETTE.textLight }}>
+        <span>Page {safeIndex + 1} / {bouquets.length}</span>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => movePage(-1)}
+            disabled={safeIndex === 0}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: WINDOW_META.flowers.colors.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={() => movePage(1)}
+            disabled={safeIndex === bouquets.length - 1}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: WINDOW_META.flowers.colors.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="flex flex-col gap-3 rounded-2xl border-4 p-4 shadow-[0_18px_35px_rgba(255,165,212,0.25)]"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          backgroundColor: '#fff7fb',
+        }}
+      >
+        {showTitle && title && (
+          <div
+            className="text-center text-sm font-bold uppercase tracking-[0.4em]"
+            style={{ color: '#a24b77' }}
+          >
+            {title}
+          </div>
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {entries.map((entry, index) => (
+            <FlowerEntry key={`${activeSpread.id}-${index}`} entry={entry} />
+          ))}
+        </div>
+
+        {caption && (
+          <p
+            className="text-center text-[13px] font-semibold tracking-wide"
+            style={{ color: PALETTE.textLight }}
+          >
+            {caption}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function FlowerEntry({ entry }) {
+  if (entry.type === 'text') {
+    return (
+      <div
+        className="h-full rounded-xl border-2 px-4 py-5 text-sm"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          backgroundColor: '#fff',
+          color: PALETTE.text,
+        }}
+      >
+        {entry.content}
+      </div>
+    )
+  }
+
+  const src = resolveFlowerAsset(entry.file)
+
+  if (!src) {
+    return (
+      <div
+        className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-5 text-center text-xs"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          color: PALETTE.textLight,
+        }}
+      >
+        Missing file
+        <span className="text-[10px]">{entry.file}</span>
+      </div>
+    )
+  }
+
+  return (
+    <figure className="overflow-hidden rounded-xl border-2" style={{ borderColor: WINDOW_META.flowers.colors.border }}>
+      <img src={src} alt={entry.alt ?? 'Bouquet photo'} className="h-full w-full object-contain bg-white" />
     </figure>
   )
 }
