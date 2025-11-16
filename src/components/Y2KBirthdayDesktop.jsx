@@ -18,6 +18,17 @@ import terePyarSrc from '../assets/music/Kaavish - Tere Pyar Main.mp3'
 import daydreamingSrc from '../assets/music/Radiohead - Daydreaming.mp3'
 import fakePlasticSrc from '../assets/music/Radiohead - Fake Plastic Trees.mp3'
 import motionPictureSrc from '../assets/music/Radiohead - Motion Picture Soundtrack.mp3'
+import photoPages from '../data/photoPages.json'
+
+const PHOTO_ASSETS = import.meta.glob('../assets/photos/*', {
+  eager: true,
+  import: 'default',
+})
+const resolvePhotoAsset = (fileName) => {
+  if (!fileName) return null
+  const match = Object.entries(PHOTO_ASSETS).find(([path]) => path.endsWith(fileName))
+  return match ? match[1] : null
+}
 const PALETTE = Object.freeze({
   bg: '#ffe6f2',
   bgAlt: '#ffd8e9',
@@ -1366,32 +1377,149 @@ function AboutContent() {
   )
 }
 function PhotosContent() {
-  return (
-    <div className="p-5 text-center space-y-4 flex flex-col items-center justify-center h-full">
+  const pages = photoPages?.pages ?? []
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  if (!pages.length) {
+    return (
       <div
-        className="w-32 h-32 flex items-center justify-center"
+        className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center font-mono text-xs"
+        style={{ color: PALETTE.text }}
+      >
+        <p className="text-sm font-semibold uppercase tracking-[0.3em]">NO PAGES FOUND</p>
+        <p className="max-w-xs text-[13px] text-rose-900/70">
+          Add a new entry to <code className="rounded bg-white/80 px-2 py-0.5">src/data/photoPages.json</code> to start curating a
+          story-driven photo book.
+        </p>
+      </div>
+    )
+  }
+
+  const safeIndex = Math.min(Math.max(currentIndex, 0), pages.length - 1)
+  const activePage = pages[safeIndex]
+  const { title, caption, entries = [], showTitle = true } = activePage
+
+  const movePage = (direction) => {
+    setCurrentIndex((prev) => {
+      const next = prev + direction
+      if (next < 0) return 0
+      if (next > pages.length - 1) return pages.length - 1
+      return next
+    })
+  }
+
+  return (
+    <div
+      className="flex h-full flex-col gap-4 p-5 font-mono"
+      style={{
+        color: PALETTE.text,
+        backgroundColor: '#fff7ec',
+      }}
+    >
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.45em]" style={{ color: PALETTE.textLight }}>
+        <span>Page {safeIndex + 1} / {pages.length}</span>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => movePage(-1)}
+            disabled={safeIndex === 0}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: PALETTE.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={() => movePage(1)}
+            disabled={safeIndex === pages.length - 1}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: PALETTE.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="flex flex-col gap-3 rounded-2xl border-4 p-4 shadow-[0_18px_35px_rgba(255,172,132,0.25)]"
         style={{
-          backgroundColor: PALETTE.accent,
-          border: `3px solid ${PALETTE.border}`,
-          boxShadow: '0 18px 40px rgba(255, 211, 125, 0.28)',
+          borderColor: PALETTE.border,
+          backgroundColor: '#fffaf1',
         }}
       >
-        <HeartIcon />
+        {showTitle && title && (
+          <div
+            className="text-center text-sm font-bold uppercase tracking-[0.4em]"
+            style={{ color: PALETTE.text }}
+          >
+            {title}
+          </div>
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {entries.map((entry, index) => (
+            <PhotoEntry key={`${activePage.id}-${index}`} entry={entry} />
+          ))}
+        </div>
+
+        {caption && (
+          <p
+            className="text-center text-[13px] font-semibold tracking-wide"
+            style={{ color: PALETTE.textLight }}
+          >
+            {caption}
+          </p>
+        )}
       </div>
+    </div>
+  )
+}
+
+function PhotoEntry({ entry }) {
+  if (entry.type === 'text') {
+    return (
       <div
-        className="px-6 py-2 text-sm font-bold tracking-widest"
+        className="h-full rounded-xl border-2 px-4 py-5 text-sm"
         style={{
-          backgroundColor: PALETTE.sunshine,
-          border: `2px solid ${PALETTE.border}`,
+          borderColor: PALETTE.sunshine,
+          backgroundColor: '#fff',
           color: PALETTE.text,
         }}
       >
-        HAPPY BIRTHDAY ALINA
+        {entry.content}
       </div>
-      <div className="text-xs font-mono" style={{ color: PALETTE.textLight }}>
-        Everything beautiful reminds me of you.
+    )
+  }
+
+  const src = resolvePhotoAsset(entry.file)
+
+  if (!src) {
+    return (
+      <div
+        className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-5 text-center text-xs"
+        style={{
+          borderColor: PALETTE.border,
+          color: PALETTE.textLight,
+        }}
+      >
+        Missing file
+        <span className="text-[10px]">{entry.file}</span>
       </div>
-    </div>
+    )
+  }
+
+  return (
+    <figure className="overflow-hidden rounded-xl border-2" style={{ borderColor: PALETTE.border }}>
+      <img src={src} alt={entry.alt ?? 'Memory photo'} className="h-full w-full object-cover" />
+    </figure>
   )
 }
 

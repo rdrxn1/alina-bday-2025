@@ -1,0 +1,18 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lavender" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d6ccff" />
+      <stop offset="100%" stop-color="#ffcce6" />
+    </linearGradient>
+    <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="2" fill="#ffffff" opacity="0.4" />
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#lavender)" />
+  <rect width="800" height="600" fill="url(#dots)" />
+  <rect x="120" y="80" width="560" height="360" rx="30" fill="#ffffff" opacity="0.35" />
+  <rect x="150" y="110" width="500" height="300" rx="25" fill="#ffffff" opacity="0.65" />
+  <text x="50%" y="75%" dominant-baseline="middle" text-anchor="middle" font-family="'Space Mono', monospace" font-size="28" fill="#3b2f63" opacity="0.8">
+    Drop your memories into assets/photos
+  </text>
+</svg>

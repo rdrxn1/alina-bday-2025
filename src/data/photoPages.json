@@ -1,0 +1,43 @@
+{
+  "pages": [
+    {
+      "id": "sunrise",
+      "title": "Sunrise playlist",
+      "showTitle": true,
+      "caption": "Snapshots of slow mornings and sleepy smiles.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Every day deserves its own mini photo spread. Use this JSON file to organize the stories you want to tell."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Gradient placeholder image"
+        },
+        {
+          "type": "image",
+          "file": "placeholder-lavender.svg",
+          "alt": "Lavender placeholder image"
+        }
+      ]
+    },
+    {
+      "id": "stargazing",
+      "title": "",
+      "showTitle": false,
+      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-aurora.svg",
+          "alt": "Placeholder gradient"
+        }
+      ]
+    }
+  ]
+}
