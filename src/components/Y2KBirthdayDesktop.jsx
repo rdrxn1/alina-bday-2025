@@ -63,16 +63,6 @@ const SCROLLBAR_STYLES = `
   }
 `
 const WINDOW_META = {
-  chat: {
-    title: 'MY_COOL_CHAT.EXE',
-    width: 340,
-    colors: {
-      border: PALETTE.lavender,
-      background: '#f1ecff',
-      titleBar: PALETTE.lavender,
-    },
-    taskLabel: 'Chat',
-  },
   music: {
     title: 'FAVORITE_MUSIC.APP',
     width: 400,
@@ -105,11 +95,11 @@ const WINDOW_META = {
   },
   email: {
     title: 'BIRTHDAY_MAIL.EML',
-    width: 360,
+    width: 560,
     colors: {
-      border: PALETTE.mint,
-      background: '#effcf7',
-      titleBar: PALETTE.mint,
+      border: PALETTE.lavender,
+      background: '#f6f2ff',
+      titleBar: PALETTE.lavender,
     },
     taskLabel: 'Email',
   },
@@ -124,17 +114,6 @@ const ICON_STYLES = Object.freeze({
       main: WINDOW_META.music.colors.titleBar,
       accent: '#ffffff',
       detail: '#2b4d66',
-    },
-  },
-  chat: {
-    tileBg: WINDOW_META.chat.colors.titleBar,
-    tileBorder: WINDOW_META.chat.colors.border,
-    labelBg: '#f6f2ff',
-    labelBorder: WINDOW_META.chat.colors.border,
-    icon: {
-      main: WINDOW_META.chat.colors.titleBar,
-      accent: '#ffffff',
-      detail: '#4a3c6d',
     },
   },
   about: {
@@ -162,12 +141,12 @@ const ICON_STYLES = Object.freeze({
   email: {
     tileBg: WINDOW_META.email.colors.titleBar,
     tileBorder: WINDOW_META.email.colors.border,
-    labelBg: '#f0fff8',
+    labelBg: '#f7f3ff',
     labelBorder: WINDOW_META.email.colors.border,
     icon: {
       main: WINDOW_META.email.colors.titleBar,
       accent: '#ffffff',
-      detail: '#3c6253',
+      detail: '#4a3c6d',
     },
   },
 })
@@ -306,11 +285,15 @@ const TRACKS = Object.freeze([
     display: 'Motion Picture Soundtrack - Radiohead',
   },
 ])
+
 const EMAIL_CONTENT = Object.freeze({
   subject: 'Welcome to Your Birthday Site',
   message: `Hey Alina,
+
 I wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.
+
 Every year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.
+
 Inside, you'll find:
 🌷 Memories - moments that live rent-free in my heart
 💌 Messages - journal entries about you, for you
@@ -318,10 +301,14 @@ Inside, you'll find:
 📸 Moments - your favorite things (because you deserve them all)
 🎂 Birthday - a little ritual just for today
 🕊️ For You - because everything beautiful reminds me of you
+
 This is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.
+
 I hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.
+
 Happy birthday, my love. Here's to another year of us.`,
 })
+
 const formatTime = (value) => {
   if (!Number.isFinite(value) || value < 0) return '0:00'
   const minutes = Math.floor(value / 60)
@@ -525,11 +512,10 @@ function useDesktopMusicPlayer(tracks) {
   }
 }
 const INITIAL_WINDOWS = {
-  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'open', maximized: false },
+  email: { x: 420, y: 160, width: 560, height: 620, zIndex: 5, status: 'closed', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
-  chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
-  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
-  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
+  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
+  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 2, status: 'open', maximized: false },
 }
 
 const createInitialWindowsState = () =>
@@ -545,19 +531,13 @@ function Y2KBirthdayDesktop() {
   const containerRef = useRef(null)
   const musicPlayer = useDesktopMusicPlayer(TRACKS)
   const { stop: stopMusic } = musicPlayer
+
   useEffect(() => {
     if (!mailUnread) {
       setMailAlertVisible(false)
-      return
     }
-    if (!mailAlertVisible) {
-      return
-    }
-    const timer = setTimeout(() => {
-      setMailAlertVisible(false)
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [mailUnread, mailAlertVisible])
+  }, [mailUnread])
+
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
       const maxZ = Math.max(...Object.values(prev).map(w => w.zIndex))
@@ -683,6 +663,7 @@ function Y2KBirthdayDesktop() {
       return { ...prev, [key]: { ...prev[key], status: 'open', maximized: false, zIndex: maxZ + 1 } }
     })
   }, [setMailAlertVisible, setMailUnread])
+
   const handleIconClick = useCallback((key) => {
     handleRestore(key)
   }, [handleRestore])
@@ -715,6 +696,7 @@ function Y2KBirthdayDesktop() {
             icon={<MailIcon {...ICON_STYLES.email.icon} />}
             label="EMAIL"
             colors={ICON_STYLES.email}
+            badge={mailUnread ? '1' : null}
             onClick={() => handleIconClick('email')}
           />
           <DesktopIcon
@@ -722,12 +704,6 @@ function Y2KBirthdayDesktop() {
             label="MY_MUSIC"
             colors={ICON_STYLES.music}
             onClick={() => handleIconClick('music')}
-          />
-          <DesktopIcon
-            icon={<ChatIcon {...ICON_STYLES.chat.icon} />}
-            label="CHAT"
-            colors={ICON_STYLES.chat}
-            onClick={() => handleIconClick('chat')}
           />
           <DesktopIcon
             icon={<FileIcon {...ICON_STYLES.about.icon} />}
@@ -742,6 +718,7 @@ function Y2KBirthdayDesktop() {
             onClick={() => handleIconClick('photos')}
           />
         </aside>
+
         {windows.email.status === 'open' && (
           <Window
             windowKey="email"
@@ -756,20 +733,14 @@ function Y2KBirthdayDesktop() {
             <EmailContent />
           </Window>
         )}
-        {windows.chat.status === 'open' && (
-          <Window
-            windowKey="chat"
-            data={windows.chat}
-            meta={WINDOW_META.chat}
-            onMouseDown={handleWindowMouseDown}
-            onResizeStart={handleResizeMouseDown}
-            onMinimize={handleMinimize}
-            onMaximize={handleMaximize}
-            onClose={handleClose}
-          >
-            <ChatContent />
-          </Window>
+
+        {mailUnread && mailAlertVisible && (
+          <MailNotification
+            onDismiss={() => setMailAlertVisible(false)}
+            onOpen={() => handleIconClick('email')}
+          />
         )}
+
         {windows.music.status === 'open' && (
           <Window
             windowKey="music"
@@ -908,22 +879,24 @@ function Window({ windowKey, data, meta, onMouseDown, onResizeStart, onMinimize,
     </div>
   )
 }
+
 function EmailContent() {
   const bulletPrefixes = ['🌷', '💌', '🎧', '📸', '🎂', '🕊️']
   const blocks = EMAIL_CONTENT.message.split('\n\n')
+
   return (
-    <div className="flex h-full flex-col gap-4 p-4" style={{ color: PALETTE.text }}>
+    <div className="flex h-full flex-col gap-6 p-6" style={{ color: PALETTE.text }}>
       <div
-        className="flex items-center justify-between gap-3 rounded-xl border-2 px-4 py-3"
+        className="flex items-center justify-between gap-6 rounded-3xl border-2 px-6 py-5"
         style={{
-          backgroundColor: '#f4fff9',
+          backgroundColor: '#f7f3ff',
           borderColor: WINDOW_META.email.colors.border,
-          boxShadow: '0 12px 24px rgba(174, 232, 206, 0.25)',
+          boxShadow: '0 14px 28px rgba(122, 102, 180, 0.25)',
         }}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-5">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-lg border-2"
+            className="flex h-14 w-14 items-center justify-center rounded-2xl border-2"
             style={{
               backgroundColor: WINDOW_META.email.colors.titleBar,
               borderColor: WINDOW_META.email.colors.border,
@@ -931,17 +904,17 @@ function EmailContent() {
           >
             <MailIcon {...ICON_STYLES.email.icon} />
           </div>
-          <div className="text-xs font-mono leading-tight">
-            <div className="font-bold uppercase tracking-[0.35em]" style={{ color: PALETTE.textLight }}>
+          <div className="text-base font-mono leading-tight">
+            <div className="text-xs font-bold uppercase tracking-[0.6em]" style={{ color: PALETTE.textLight }}>
               From: Waleed
             </div>
-            <div className="text-sm font-semibold" style={{ color: PALETTE.text }}>
+            <div className="text-2xl font-semibold" style={{ color: PALETTE.text }}>
               Subject: {EMAIL_CONTENT.subject}
             </div>
           </div>
         </div>
         <div
-          className="rounded-full border-2 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.3em]"
+          className="rounded-full border-2 px-5 py-2 text-sm font-bold uppercase tracking-[0.45em]"
           style={{
             backgroundColor: '#ffffff',
             borderColor: WINDOW_META.email.colors.border,
@@ -951,12 +924,13 @@ function EmailContent() {
           Inbox
         </div>
       </div>
+
       <div
-        className="flex-1 space-y-5 overflow-y-auto rounded-2xl border-2 p-5 custom-scroll"
+        className="flex-1 space-y-7 overflow-y-auto rounded-3xl border-2 p-7 custom-scroll"
         style={{
           borderColor: WINDOW_META.email.colors.border,
-          background: 'linear-gradient(180deg, #ffffff 0%, #f0fff8 100%)',
-          boxShadow: '0 18px 40px rgba(90, 61, 122, 0.12)',
+          background: 'linear-gradient(180deg, #ffffff 0%, #f3edff 100%)',
+          boxShadow: '0 22px 48px rgba(90, 61, 122, 0.16)',
         }}
       >
         {blocks.map((block, blockIndex) => {
@@ -964,25 +938,27 @@ function EmailContent() {
           if (lines.length === 0) {
             return null
           }
+
           const hasList =
             lines.length > 1 &&
             lines.slice(1).every((line) => bulletPrefixes.some((prefix) => line.trim().startsWith(prefix)))
+
           if (hasList) {
             return (
-              <div key={blockIndex} className="space-y-2">
-                <p className="text-sm font-semibold" style={{ color: PALETTE.text }}>
+              <div key={blockIndex} className="space-y-4">
+                <p className="text-2xl font-semibold" style={{ color: PALETTE.text }}>
                   {lines[0]}
                 </p>
-                <ul className="space-y-1.5 text-sm font-mono" style={{ color: PALETTE.text }}>
+                <ul className="space-y-3 text-lg font-mono" style={{ color: PALETTE.text }}>
                   {lines.slice(1).map((line, index) => {
                     const trimmed = line.trim()
                     const firstSpace = trimmed.indexOf(' ')
                     const icon = firstSpace >= 0 ? trimmed.slice(0, firstSpace) : trimmed
                     const text = firstSpace >= 0 ? trimmed.slice(firstSpace + 1).trim() : ''
                     return (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-base">{icon}</span>
-                        <span className="flex-1 leading-relaxed">{text}</span>
+                      <li key={index} className="flex items-start gap-4">
+                        <span className="text-2xl leading-none">{icon}</span>
+                        <span className="flex-1 text-xl leading-relaxed">{text}</span>
                       </li>
                     )
                   })}
@@ -990,8 +966,9 @@ function EmailContent() {
               </div>
             )
           }
+
           return (
-            <p key={blockIndex} className="text-sm leading-relaxed" style={{ color: PALETTE.text }}>
+            <p key={blockIndex} className="text-xl leading-relaxed" style={{ color: PALETTE.text }}>
               {lines.map((line, lineIndex) => (
                 <span key={lineIndex}>
                   {line}
@@ -1001,69 +978,18 @@ function EmailContent() {
             </p>
           )
         })}
-        <div className="rounded-xl border-2 px-4 py-3 text-sm" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
-          <div className="font-semibold" style={{ color: PALETTE.text }}>
+
+        <div className="rounded-3xl border-2 px-6 py-5 text-lg" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
+          <div className="text-2xl font-semibold" style={{ color: PALETTE.text }}>
             With all my love,
           </div>
-          <div className="text-base font-bold" style={{ color: PALETTE.text }}>
+          <div className="text-3xl font-bold" style={{ color: PALETTE.text }}>
             Waleed
           </div>
-          <div className="text-[10px] uppercase tracking-[0.4em]" style={{ color: PALETTE.textLight }}>
+          <div className="text-xs uppercase tracking-[0.55em]" style={{ color: PALETTE.textLight }}>
             November 2025
           </div>
         </div>
-      </div>
-    </div>
-  )
-}
-function ChatContent() {
-  return (
-    <div className="p-4 space-y-3 text-sm">
-      <div
-        className="h-40 overflow-y-auto p-3 text-sm font-mono custom-scroll"
-        style={{
-          border: `2px solid ${PALETTE.lavender}`,
-          backgroundColor: '#f1e9ff',
-        }}
-      >
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Hey! Happy birthday!!</span>
-        </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Thanks so much!</span>
-        </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Tonight's desktop is all yours.</span>
-        </div>
-        <div>
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Then play me Kaavish and tell me a secret.</span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-1 px-3 py-2 text-sm border-2 focus:outline-none"
-          style={{
-            borderColor: PALETTE.accent,
-            backgroundColor: PALETTE.bg,
-            color: PALETTE.text,
-          }}
-        />
-        <button
-          className="px-4 py-2 text-sm font-bold border-2 transition-opacity hover:opacity-80"
-          style={{
-            backgroundColor: PALETTE.accent,
-            borderColor: PALETTE.border,
-            color: PALETTE.text,
-          }}
-        >
-          SEND
-        </button>
       </div>
     </div>
   )
@@ -1468,34 +1394,40 @@ function PhotosContent() {
     </div>
   )
 }
-function MailNotification({ onDismiss }) {
+
+function MailNotification({ onDismiss, onOpen }) {
   return (
     <div
-      className="absolute right-12 bottom-24 flex max-w-xs cursor-pointer flex-col gap-2 rounded-xl border-4 px-5 py-4 shadow-lg"
+      className="absolute right-10 top-10 flex max-w-xs cursor-pointer flex-col gap-2 rounded-2xl border-4 px-5 py-4 shadow-lg"
       style={{
         backgroundColor: PALETTE.windowBg,
         borderColor: WINDOW_META.email.colors.border,
         color: PALETTE.text,
-        boxShadow: '0 18px 30px rgba(60, 98, 83, 0.22)',
+        boxShadow: '0 18px 30px rgba(116, 96, 164, 0.25)',
+        zIndex: 999,
       }}
-      onClick={onDismiss}
+      onClick={() => {
+        onOpen?.()
+        onDismiss?.()
+      }}
     >
-      <div className="flex items-center gap-3 text-sm font-semibold tracking-wide">
+      <div className="flex items-center gap-3 text-base font-semibold tracking-wide">
         <MailIcon {...ICON_STYLES.email.icon} />
         YOU'VE GOT MAIL!
       </div>
-      <div className="text-xs font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
-        Click the EMAIL icon to read your birthday message.
+      <div className="text-sm font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
+        Tap here to jump straight into your birthday inbox.
       </div>
       <div
-        className="self-end text-[10px] font-semibold tracking-[0.35em]"
+        className="self-end text-[11px] font-semibold tracking-[0.4em]"
         style={{ color: WINDOW_META.email.colors.border }}
       >
-        TAP TO DISMISS
+        OPEN MAIL
       </div>
     </div>
   )
 }
+
 function DesktopIcon({ icon, label, onClick, colors, badge }) {
   const palette = colors ?? {
     tileBg: PALETTE.accent,
@@ -1521,10 +1453,10 @@ function DesktopIcon({ icon, label, onClick, colors, badge }) {
           <span
             className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold"
             style={{
-              backgroundColor: WINDOW_META.email.colors.titleBar,
-              borderColor: WINDOW_META.email.colors.border,
-              color: PALETTE.text,
-              boxShadow: '0 6px 12px rgba(60, 98, 83, 0.35)',
+              backgroundColor: '#ff4d6d',
+              borderColor: '#b3132c',
+              color: '#fff4f7',
+              boxShadow: '0 6px 12px rgba(179, 19, 44, 0.4)',
             }}
           >
             {badge}
@@ -1800,7 +1732,7 @@ function MiniMusicControls({ player, palette, onRestore }) {
   )
 }
 // SVG Icons
-function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.text }) {
+function MailIcon({ main = PALETTE.lavender, accent = '#ffffff', detail = '#4a3c6d' }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <rect x="3" y="5" width="18" height="14" rx="2" stroke={detail} strokeWidth="2" fill={main} />
@@ -1811,22 +1743,13 @@ function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.te
     </svg>
   )
 }
+
 function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <path d="M9 18V5L21 3V16" stroke={detail} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"/>
       <rect x="3" y="15" width="6" height="6" stroke={detail} strokeWidth="2" fill={main}/>
       <rect x="15" y="13" width="6" height="6" stroke={detail} strokeWidth="2" fill={accent}/>
-    </svg>
-  )
-}
-function ChatIcon({ main = PALETTE.accent, accent = PALETTE.lavender, detail = PALETTE.text }) {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="18" height="14" stroke={detail} strokeWidth="2" fill={main}/>
-      <path d="M3 17L7 21V17H3Z" stroke={detail} strokeWidth="2" fill={accent}/>
-      <line x1="7" y1="8" x2="17" y2="8" stroke={detail} strokeWidth="2"/>
-      <line x1="7" y1="12" x2="14" y2="12" stroke={detail} strokeWidth="2"/>
     </svg>
   )
 }
