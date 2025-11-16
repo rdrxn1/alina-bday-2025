@@ -72,16 +72,6 @@ const SCROLLBAR_STYLES = `
 `
 
 const WINDOW_META = {
-  chat: {
-    title: 'MY_COOL_CHAT.EXE',
-    width: 340,
-    colors: {
-      border: PALETTE.lavender,
-      background: '#f1ecff',
-      titleBar: PALETTE.lavender,
-    },
-    taskLabel: 'Chat',
-  },
   music: {
     title: 'FAVORITE_MUSIC.APP',
     width: 400,
@@ -112,6 +102,16 @@ const WINDOW_META = {
     },
     taskLabel: 'Photos',
   },
+  email: {
+    title: 'BIRTHDAY_MAIL.EML',
+    width: 440,
+    colors: {
+      border: PALETTE.lavender,
+      background: '#f6f2ff',
+      titleBar: PALETTE.lavender,
+    },
+    taskLabel: 'Email',
+  },
 }
 
 const ICON_STYLES = Object.freeze({
@@ -124,17 +124,6 @@ const ICON_STYLES = Object.freeze({
       main: WINDOW_META.music.colors.titleBar,
       accent: '#ffffff',
       detail: '#2b4d66',
-    },
-  },
-  chat: {
-    tileBg: WINDOW_META.chat.colors.titleBar,
-    tileBorder: WINDOW_META.chat.colors.border,
-    labelBg: '#f6f2ff',
-    labelBorder: WINDOW_META.chat.colors.border,
-    icon: {
-      main: WINDOW_META.chat.colors.titleBar,
-      accent: '#ffffff',
-      detail: '#4a3c6d',
     },
   },
   about: {
@@ -157,6 +146,17 @@ const ICON_STYLES = Object.freeze({
       main: WINDOW_META.photos.colors.titleBar,
       accent: '#ffffff',
       detail: '#7a4f1d',
+    },
+  },
+  email: {
+    tileBg: WINDOW_META.email.colors.titleBar,
+    tileBorder: WINDOW_META.email.colors.border,
+    labelBg: '#f7f3ff',
+    labelBorder: WINDOW_META.email.colors.border,
+    icon: {
+      main: WINDOW_META.email.colors.titleBar,
+      accent: '#ffffff',
+      detail: '#4a3c6d',
     },
   },
 })
@@ -296,6 +296,29 @@ const TRACKS = Object.freeze([
     display: 'Motion Picture Soundtrack - Radiohead',
   },
 ])
+
+const EMAIL_CONTENT = Object.freeze({
+  subject: 'Welcome to Your Birthday Site',
+  message: `Hey Alina,
+
+I wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.
+
+Every year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.
+
+Inside, you'll find:
+🌷 Memories - moments that live rent-free in my heart
+💌 Messages - journal entries about you, for you
+🎧 Songs - the soundtrack to our story
+📸 Moments - your favorite things (because you deserve them all)
+🎂 Birthday - a little ritual just for today
+🕊️ For You - because everything beautiful reminds me of you
+
+This is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.
+
+I hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.
+
+Happy birthday, my love. Here's to another year of us.`,
+})
 
 const formatTime = (value) => {
   if (!Number.isFinite(value) || value < 0) return '0:00'
@@ -534,20 +557,31 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
+  email: { x: 480, y: 260, width: 440, height: 520, zIndex: 5, status: 'closed', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
-  chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
-  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
-  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 1, status: 'open', maximized: false },
+  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
+  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 2, status: 'open', maximized: false },
 }
 
+const createInitialWindowsState = () =>
+  Object.fromEntries(Object.entries(INITIAL_WINDOWS).map(([key, value]) => [key, { ...value }]))
+
 function Y2KBirthdayDesktop() {
-  const [windows, setWindows] = useState(INITIAL_WINDOWS)
+  const [windows, setWindows] = useState(() => createInitialWindowsState())
   const [dragState, setDragState] = useState(null)
   const [resizeState, setResizeState] = useState(null)
   const [startOpen, setStartOpen] = useState(false)
+  const [mailUnread, setMailUnread] = useState(true)
+  const [mailAlertVisible, setMailAlertVisible] = useState(true)
   const containerRef = useRef(null)
   const musicPlayer = useDesktopMusicPlayer(TRACKS)
   const { stop: stopMusic } = musicPlayer
+
+  useEffect(() => {
+    if (!mailUnread) {
+      setMailAlertVisible(false)
+    }
+  }, [mailUnread])
 
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
@@ -683,11 +717,15 @@ function Y2KBirthdayDesktop() {
 
   const handleRestore = useCallback((key) => {
     setStartOpen(false)
+    if (key === 'email') {
+      setMailUnread(false)
+      setMailAlertVisible(false)
+    }
     setWindows(prev => {
       const maxZ = Math.max(...Object.values(prev).map(w => w.zIndex))
       return { ...prev, [key]: { ...prev[key], status: 'open', maximized: false, zIndex: maxZ + 1 } }
     })
-  }, [])
+  }, [setMailAlertVisible, setMailUnread])
 
   const handleIconClick = useCallback((key) => {
     handleRestore(key)
@@ -721,45 +759,53 @@ function Y2KBirthdayDesktop() {
         <FloatingShapes />
 
         <aside className="absolute left-5 top-8 flex flex-col gap-6">
-        <DesktopIcon
-          icon={<MusicIcon {...ICON_STYLES.music.icon} />}
-          label="MY_MUSIC"
-          colors={ICON_STYLES.music}
-          onClick={() => handleIconClick('music')}
-        />
-        <DesktopIcon
-          icon={<ChatIcon {...ICON_STYLES.chat.icon} />}
-          label="CHAT"
-          colors={ICON_STYLES.chat}
-          onClick={() => handleIconClick('chat')}
-        />
-        <DesktopIcon
-          icon={<FileIcon {...ICON_STYLES.about.icon} />}
-          label="ABOUT"
-          colors={ICON_STYLES.about}
-          onClick={() => handleIconClick('about')}
-        />
-        <DesktopIcon
-          icon={<PhotoIcon {...ICON_STYLES.photos.icon} />}
-          label="PHOTOS"
-          colors={ICON_STYLES.photos}
-          onClick={() => handleIconClick('photos')}
-        />
+          <DesktopIcon
+            icon={<MailIcon {...ICON_STYLES.email.icon} />}
+            label="EMAIL"
+            colors={ICON_STYLES.email}
+            badge={mailUnread ? '1' : null}
+            onClick={() => handleIconClick('email')}
+          />
+          <DesktopIcon
+            icon={<MusicIcon {...ICON_STYLES.music.icon} />}
+            label="MY_MUSIC"
+            colors={ICON_STYLES.music}
+            onClick={() => handleIconClick('music')}
+          />
+          <DesktopIcon
+            icon={<FileIcon {...ICON_STYLES.about.icon} />}
+            label="ABOUT"
+            colors={ICON_STYLES.about}
+            onClick={() => handleIconClick('about')}
+          />
+          <DesktopIcon
+            icon={<PhotoIcon {...ICON_STYLES.photos.icon} />}
+            label="PHOTOS"
+            colors={ICON_STYLES.photos}
+            onClick={() => handleIconClick('photos')}
+          />
         </aside>
 
-        {windows.chat.status === 'open' && (
+        {windows.email.status === 'open' && (
           <Window
-            windowKey="chat"
-            data={windows.chat}
-            meta={WINDOW_META.chat}
+            windowKey="email"
+            data={windows.email}
+            meta={WINDOW_META.email}
             onMouseDown={handleWindowMouseDown}
             onResizeStart={handleResizeMouseDown}
             onMinimize={handleMinimize}
             onMaximize={handleMaximize}
             onClose={handleClose}
           >
-            <ChatContent />
+            <EmailContent />
           </Window>
+        )}
+
+        {mailUnread && mailAlertVisible && (
+          <MailNotification
+            onDismiss={() => setMailAlertVisible(false)}
+            onOpen={() => handleIconClick('email')}
+          />
         )}
 
         {windows.music.status === 'open' && (
@@ -907,54 +953,116 @@ function Window({ windowKey, data, meta, onMouseDown, onResizeStart, onMinimize,
   )
 }
 
-function ChatContent() {
+function EmailContent() {
+  const bulletPrefixes = ['🌷', '💌', '🎧', '📸', '🎂', '🕊️']
+  const blocks = EMAIL_CONTENT.message.split('\n\n')
+
   return (
-    <div className="p-4 space-y-3 text-sm">
+    <div className="flex h-full flex-col gap-5 p-5" style={{ color: PALETTE.text }}>
       <div
-        className="h-40 overflow-y-auto p-3 text-sm font-mono custom-scroll"
+        className="flex items-center justify-between gap-4 rounded-2xl border-2 px-5 py-4"
         style={{
-          border: `2px solid ${PALETTE.lavender}`,
-          backgroundColor: '#f1e9ff',
+          backgroundColor: '#f7f3ff',
+          borderColor: WINDOW_META.email.colors.border,
+          boxShadow: '0 14px 28px rgba(122, 102, 180, 0.25)',
         }}
       >
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Hey! Happy birthday!!</span>
+        <div className="flex items-center gap-4">
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-xl border-2"
+            style={{
+              backgroundColor: WINDOW_META.email.colors.titleBar,
+              borderColor: WINDOW_META.email.colors.border,
+            }}
+          >
+            <MailIcon {...ICON_STYLES.email.icon} />
+          </div>
+          <div className="text-sm font-mono leading-tight">
+            <div className="text-xs font-bold uppercase tracking-[0.4em]" style={{ color: PALETTE.textLight }}>
+              From: Waleed
+            </div>
+            <div className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+              Subject: {EMAIL_CONTENT.subject}
+            </div>
+          </div>
         </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Thanks so much!</span>
-        </div>
-        <div className="mb-3">
-          <span className="font-bold" style={{ color: PALETTE.text }}>Waleed:</span>
-          <span style={{ color: PALETTE.textLight }}> Tonight's desktop is all yours.</span>
-        </div>
-        <div>
-          <span className="font-bold" style={{ color: PALETTE.text }}>Alina:</span>
-          <span style={{ color: PALETTE.textLight }}> Then play me Kaavish and tell me a secret.</span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-1 px-3 py-2 text-sm border-2 focus:outline-none"
+        <div
+          className="rounded-full border-2 px-4 py-1 text-[13px] font-bold uppercase tracking-[0.35em]"
           style={{
-            borderColor: PALETTE.accent,
-            backgroundColor: PALETTE.bg,
-            color: PALETTE.text,
-          }}
-        />
-        <button
-          className="px-4 py-2 text-sm font-bold border-2 transition-opacity hover:opacity-80"
-          style={{
-            backgroundColor: PALETTE.accent,
-            borderColor: PALETTE.border,
+            backgroundColor: '#ffffff',
+            borderColor: WINDOW_META.email.colors.border,
             color: PALETTE.text,
           }}
         >
-          SEND
-        </button>
+          Inbox
+        </div>
+      </div>
+
+      <div
+        className="flex-1 space-y-6 overflow-y-auto rounded-3xl border-2 p-6 custom-scroll"
+        style={{
+          borderColor: WINDOW_META.email.colors.border,
+          background: 'linear-gradient(180deg, #ffffff 0%, #f3edff 100%)',
+          boxShadow: '0 22px 48px rgba(90, 61, 122, 0.16)',
+        }}
+      >
+        {blocks.map((block, blockIndex) => {
+          const lines = block.split('\n').filter(Boolean)
+          if (lines.length === 0) {
+            return null
+          }
+
+          const hasList =
+            lines.length > 1 &&
+            lines.slice(1).every((line) => bulletPrefixes.some((prefix) => line.trim().startsWith(prefix)))
+
+          if (hasList) {
+            return (
+              <div key={blockIndex} className="space-y-3">
+                <p className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+                  {lines[0]}
+                </p>
+                <ul className="space-y-2 text-base font-mono" style={{ color: PALETTE.text }}>
+                  {lines.slice(1).map((line, index) => {
+                    const trimmed = line.trim()
+                    const firstSpace = trimmed.indexOf(' ')
+                    const icon = firstSpace >= 0 ? trimmed.slice(0, firstSpace) : trimmed
+                    const text = firstSpace >= 0 ? trimmed.slice(firstSpace + 1).trim() : ''
+                    return (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-xl leading-none">{icon}</span>
+                        <span className="flex-1 text-lg leading-relaxed">{text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          }
+
+          return (
+            <p key={blockIndex} className="text-lg leading-relaxed" style={{ color: PALETTE.text }}>
+              {lines.map((line, lineIndex) => (
+                <span key={lineIndex}>
+                  {line}
+                  {lineIndex < lines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          )
+        })}
+
+        <div className="rounded-2xl border-2 px-5 py-4 text-base" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
+          <div className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+            With all my love,
+          </div>
+          <div className="text-2xl font-bold" style={{ color: PALETTE.text }}>
+            Waleed
+          </div>
+          <div className="text-[11px] uppercase tracking-[0.45em]" style={{ color: PALETTE.textLight }}>
+            November 2025
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -1402,7 +1510,40 @@ function PhotosContent() {
   )
 }
 
-function DesktopIcon({ icon, label, onClick, colors }) {
+function MailNotification({ onDismiss, onOpen }) {
+  return (
+    <div
+      className="absolute right-10 top-10 flex max-w-xs cursor-pointer flex-col gap-2 rounded-2xl border-4 px-5 py-4 shadow-lg"
+      style={{
+        backgroundColor: PALETTE.windowBg,
+        borderColor: WINDOW_META.email.colors.border,
+        color: PALETTE.text,
+        boxShadow: '0 18px 30px rgba(116, 96, 164, 0.25)',
+        zIndex: 999,
+      }}
+      onClick={() => {
+        onOpen?.()
+        onDismiss?.()
+      }}
+    >
+      <div className="flex items-center gap-3 text-base font-semibold tracking-wide">
+        <MailIcon {...ICON_STYLES.email.icon} />
+        YOU'VE GOT MAIL!
+      </div>
+      <div className="text-sm font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
+        Tap here to jump straight into your birthday inbox.
+      </div>
+      <div
+        className="self-end text-[11px] font-semibold tracking-[0.4em]"
+        style={{ color: WINDOW_META.email.colors.border }}
+      >
+        OPEN MAIL
+      </div>
+    </div>
+  )
+}
+
+function DesktopIcon({ icon, label, onClick, colors, badge }) {
   const palette = colors ?? {
     tileBg: PALETTE.accent,
     tileBorder: PALETTE.border,
@@ -1416,7 +1557,7 @@ function DesktopIcon({ icon, label, onClick, colors }) {
       onClick={onClick}
     >
       <div
-        className="w-14 h-14 flex items-center justify-center border-3"
+        className="relative flex h-14 w-14 items-center justify-center border-3"
         style={{
           backgroundColor: palette.tileBg,
           border: `3px solid ${palette.tileBorder}`,
@@ -1424,6 +1565,19 @@ function DesktopIcon({ icon, label, onClick, colors }) {
         }}
       >
         {icon}
+        {badge && (
+          <span
+            className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold"
+            style={{
+              backgroundColor: '#ff4d6d',
+              borderColor: '#b3132c',
+              color: '#fff4f7',
+              boxShadow: '0 6px 12px rgba(179, 19, 44, 0.4)',
+            }}
+          >
+            {badge}
+          </span>
+        )}
       </div>
       <div
         className="text-sm font-semibold text-center px-3 py-1 tracking-wide"
@@ -1706,23 +1860,24 @@ function MiniMusicControls({ player, palette, onRestore }) {
 }
 
 // SVG Icons
+function MailIcon({ main = PALETTE.lavender, accent = '#ffffff', detail = '#4a3c6d' }) {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={detail} strokeWidth="2" fill={main} />
+      <path d="M4 6L12 13L20 6" stroke={detail} strokeWidth="2" fill="none" />
+      <path d="M4 19L10.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <path d="M20 19L13.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <rect x="7" y="8" width="10" height="3" fill={accent} stroke={detail} strokeWidth="1" />
+    </svg>
+  )
+}
+
 function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <path d="M9 18V5L21 3V16" stroke={detail} strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter"/>
       <rect x="3" y="15" width="6" height="6" stroke={detail} strokeWidth="2" fill={main}/>
       <rect x="15" y="13" width="6" height="6" stroke={detail} strokeWidth="2" fill={accent}/>
-    </svg>
-  )
-}
-
-function ChatIcon({ main = PALETTE.accent, accent = PALETTE.lavender, detail = PALETTE.text }) {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="18" height="14" stroke={detail} strokeWidth="2" fill={main}/>
-      <path d="M3 17L7 21V17H3Z" stroke={detail} strokeWidth="2" fill={accent}/>
-      <line x1="7" y1="8" x2="17" y2="8" stroke={detail} strokeWidth="2"/>
-      <line x1="7" y1="12" x2="14" y2="12" stroke={detail} strokeWidth="2"/>
     </svg>
   )
 }
