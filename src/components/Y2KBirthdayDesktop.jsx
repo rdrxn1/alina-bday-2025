@@ -298,24 +298,13 @@ const TRACKS = Object.freeze([
 ])
 
 const EMAIL_CONTENT = Object.freeze({
-  subject: 'Welcome to Your Birthday Site',
-  message: `Hey Alina,
+  subject: 'Welcome to Your Site',
+  message: `Hi baby,
+It might not look like much. But I've worked really long and hard on this. I wanted to create an experience to mark your day, and to celebrate you. Unfortunately it took ages for me to finish it. But to me, this is something special, and I hope that 
+it is for you as well. Welcome to YOUR site. This is an experience built for you, to celebrate you. it's a place that has all your favourite songs (or some of them for now haha), our favourite memories and anything else we could want. It's a living, breathing 
+thing that we can build on every year, and keep the previous iteration as a time capsule! Every year the OS gets updated - pretty cool rigtht?
 
-I wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.
-
-Every year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.
-
-Inside, you'll find:
-🌷 Memories - moments that live rent-free in my heart
-💌 Messages - journal entries about you, for you
-🎧 Songs - the soundtrack to our story
-📸 Moments - your favorite things (because you deserve them all)
-🎂 Birthday - a little ritual just for today
-🕊️ For You - because everything beautiful reminds me of you
-
-This is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.
-
-I hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.
+This is a teeny tiny gift for you, baby. I hope this brings you a little joy. You deserve all the happiness the world can offer. 
 
 Happy birthday, my love. Here's to another year of us.`,
 })
