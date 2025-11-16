@@ -543,10 +543,10 @@ function useDesktopMusicPlayer(tracks) {
   }
 }
 const INITIAL_WINDOWS = {
-  email: { x: 420, y: 160, width: 560, height: 620, zIndex: 6, status: 'closed', maximized: false },
+  email: { x: 420, y: 160, width: 980, height: 880, zIndex: 6, status: 'closed', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 5, status: 'open', maximized: false },
-  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 4, status: 'open', maximized: false },
-  photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 3, status: 'open', maximized: false },
+  about: { x: 210, y: 210, width: 320, height: 300, zIndex: 1, status: 'open', maximized: false },
+  photos: { x: 120, y: 420, width: 550, height: 800, zIndex: 5, status: 'open', maximized: false },
   flowers: { x: 450, y: 430, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
 }
 
@@ -1036,11 +1036,8 @@ function EmailContent() {
             With all my love,
           </div>
           <div className="text-3xl font-bold" style={{ color: PALETTE.text }}>
-            Waleed
-          </div>
-          <div className="text-xs uppercase tracking-[0.55em]" style={{ color: PALETTE.textLight }}>
-            November 2025
-          </div>
+            Wallu
+          </div>        
         </div>
       </div>
     </div>
