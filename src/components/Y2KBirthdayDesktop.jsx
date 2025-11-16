@@ -578,7 +578,7 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'closed', maximized: false },
+  email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'open', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
   chat: { x: 90, y: 90, width: 340, height: 320, zIndex: 3, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 2, status: 'open', maximized: false },
@@ -602,8 +602,19 @@ function Y2KBirthdayDesktop() {
   useEffect(() => {
     if (!mailUnread) {
       setMailAlertVisible(false)
+      return
     }
-  }, [mailUnread])
+
+    if (!mailAlertVisible) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setMailAlertVisible(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [mailUnread, mailAlertVisible])
 
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
@@ -785,7 +796,6 @@ function Y2KBirthdayDesktop() {
             icon={<MailIcon {...ICON_STYLES.email.icon} />}
             label="EMAIL"
             colors={ICON_STYLES.email}
-            badge={mailUnread ? '1' : null}
             onClick={() => handleIconClick('email')}
           />
           <DesktopIcon
@@ -827,10 +837,6 @@ function Y2KBirthdayDesktop() {
           >
             <EmailContent />
           </Window>
-        )}
-
-        {mailUnread && mailAlertVisible && (
-          <MailNotification onDismiss={() => setMailAlertVisible(false)} />
         )}
 
         {windows.chat.status === 'open' && (
@@ -1612,7 +1618,6 @@ function MailNotification({ onDismiss }) {
         borderColor: WINDOW_META.email.colors.border,
         color: PALETTE.text,
         boxShadow: '0 18px 30px rgba(60, 98, 83, 0.22)',
-        zIndex: 999,
       }}
       onClick={onDismiss}
     >
