@@ -19,6 +19,7 @@ import daydreamingSrc from '../assets/music/Radiohead - Daydreaming.mp3'
 import fakePlasticSrc from '../assets/music/Radiohead - Fake Plastic Trees.mp3'
 import motionPictureSrc from '../assets/music/Radiohead - Motion Picture Soundtrack.mp3'
 import photoPages from '../data/photoPages.json'
+import flowerPages from '../data/flowerPages.json'
 
 const PHOTO_ASSETS = import.meta.glob('../assets/photos/*', {
   eager: true,
@@ -27,6 +28,15 @@ const PHOTO_ASSETS = import.meta.glob('../assets/photos/*', {
 const resolvePhotoAsset = (fileName) => {
   if (!fileName) return null
   const match = Object.entries(PHOTO_ASSETS).find(([path]) => path.endsWith(fileName))
+  return match ? match[1] : null
+}
+const FLOWER_ASSETS = import.meta.glob('../assets/flowers/*', {
+  eager: true,
+  import: 'default',
+})
+const resolveFlowerAsset = (fileName) => {
+  if (!fileName) return null
+  const match = Object.entries(FLOWER_ASSETS).find(([path]) => path.endsWith(fileName))
   return match ? match[1] : null
 }
 const PALETTE = Object.freeze({
@@ -104,6 +114,16 @@ const WINDOW_META = {
     },
     taskLabel: 'Photos',
   },
+  flowers: {
+    title: 'PIXEL_BOUQUETS.PNG',
+    width: 320,
+    colors: {
+      border: PALETTE.peach,
+      background: '#fff5ef',
+      titleBar: PALETTE.peach,
+    },
+    taskLabel: 'Flowers',
+  },
   email: {
     title: 'BIRTHDAY_MAIL.EML',
     width: 560,
@@ -147,6 +167,17 @@ const ICON_STYLES = Object.freeze({
       main: WINDOW_META.photos.colors.titleBar,
       accent: '#ffffff',
       detail: '#7a4f1d',
+    },
+  },
+  flowers: {
+    tileBg: WINDOW_META.flowers.colors.titleBar,
+    tileBorder: WINDOW_META.flowers.colors.border,
+    labelBg: '#ffe9e0',
+    labelBorder: WINDOW_META.flowers.colors.border,
+    icon: {
+      main: WINDOW_META.flowers.colors.titleBar,
+      accent: '#ffffff',
+      detail: '#8a4a32',
     },
   },
   email: {
@@ -527,6 +558,7 @@ const INITIAL_WINDOWS = {
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
   photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 2, status: 'open', maximized: false },
+  flowers: { x: 80, y: 120, width: 320, height: 300, zIndex: 1, status: 'open', maximized: false },
 }
 
 const createInitialWindowsState = () =>
@@ -722,13 +754,19 @@ function Y2KBirthdayDesktop() {
             colors={ICON_STYLES.about}
             onClick={() => handleIconClick('about')}
           />
-          <DesktopIcon
-            icon={<PhotoIcon {...ICON_STYLES.photos.icon} />}
-            label="PHOTOS"
-            colors={ICON_STYLES.photos}
-            onClick={() => handleIconClick('photos')}
-          />
-        </aside>
+        <DesktopIcon
+          icon={<PhotoIcon {...ICON_STYLES.photos.icon} />}
+          label="PHOTOS"
+          colors={ICON_STYLES.photos}
+          onClick={() => handleIconClick('photos')}
+        />
+        <DesktopIcon
+          icon={<FlowerIcon {...ICON_STYLES.flowers.icon} />}
+          label="FLOWERS"
+          colors={ICON_STYLES.flowers}
+          onClick={() => handleIconClick('flowers')}
+        />
+      </aside>
 
         {windows.email.status === 'open' && (
           <Window
@@ -792,6 +830,20 @@ function Y2KBirthdayDesktop() {
             onClose={handleClose}
           >
             <PhotosContent />
+          </Window>
+        )}
+        {windows.flowers.status === 'open' && (
+          <Window
+            windowKey="flowers"
+            data={windows.flowers}
+            meta={WINDOW_META.flowers}
+            onMouseDown={handleWindowMouseDown}
+            onResizeStart={handleResizeMouseDown}
+            onMinimize={handleMinimize}
+            onMaximize={handleMaximize}
+            onClose={handleClose}
+          >
+            <FlowersContent />
           </Window>
         )}
         <audio
@@ -1483,6 +1535,153 @@ function PhotosContent() {
   )
 }
 
+function FlowersContent() {
+  const pages = flowerPages?.pages ?? []
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  if (!pages.length) {
+    return (
+      <div
+        className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center font-mono text-xs"
+        style={{ color: PALETTE.text }}
+      >
+        <p className="text-sm font-semibold uppercase tracking-[0.3em]">NO BOUQUETS YET</p>
+        <p className="max-w-xs text-[13px] text-rose-900/70">
+          Add a new spread to <code className="rounded bg-white/80 px-2 py-0.5">src/data/flowerPages.json</code> and drop PNGs
+          into <code className="rounded bg-white/80 px-2 py-0.5">src/assets/flowers</code> to see your arrangements here.
+        </p>
+      </div>
+    )
+  }
+
+  const safeIndex = Math.min(Math.max(currentIndex, 0), pages.length - 1)
+  const activePage = pages[safeIndex]
+  const { title, caption, entries = [], showTitle = true } = activePage
+
+  const movePage = (direction) => {
+    setCurrentIndex((prev) => {
+      const next = prev + direction
+      if (next < 0) return 0
+      if (next > pages.length - 1) return pages.length - 1
+      return next
+    })
+  }
+
+  return (
+    <div
+      className="flex h-full flex-col gap-4 p-5 font-mono"
+      style={{
+        color: PALETTE.text,
+        backgroundColor: '#fff3ec',
+      }}
+    >
+      <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.45em]" style={{ color: PALETTE.textLight }}>
+        <span>Bouquet {safeIndex + 1} / {pages.length}</span>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => movePage(-1)}
+            disabled={safeIndex === 0}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: WINDOW_META.flowers.colors.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={() => movePage(1)}
+            disabled={safeIndex === pages.length - 1}
+            className="rounded-full border-2 px-3 py-1 text-[10px] font-semibold transition disabled:opacity-40"
+            style={{
+              borderColor: WINDOW_META.flowers.colors.border,
+              color: PALETTE.text,
+              backgroundColor: '#fff',
+            }}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="flex flex-col gap-3 rounded-2xl border-4 p-4 shadow-[0_18px_35px_rgba(255,167,145,0.25)]"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          backgroundColor: '#fff9f5',
+        }}
+      >
+        {showTitle && title && (
+          <div
+            className="text-center text-sm font-bold uppercase tracking-[0.4em]"
+            style={{ color: PALETTE.text }}
+          >
+            {title}
+          </div>
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {entries.map((entry, index) => (
+            <FlowerEntry key={`${activePage.id}-${index}`} entry={entry} />
+          ))}
+        </div>
+
+        {caption && (
+          <p
+            className="text-center text-[13px] font-semibold tracking-wide"
+            style={{ color: PALETTE.textLight }}
+          >
+            {caption}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function FlowerEntry({ entry }) {
+  if (entry.type === 'text') {
+    return (
+      <div
+        className="h-full rounded-xl border-2 px-4 py-5 text-sm"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          backgroundColor: '#fff',
+          color: PALETTE.text,
+        }}
+      >
+        {entry.content}
+      </div>
+    )
+  }
+
+  const src = resolveFlowerAsset(entry.file)
+
+  if (!src) {
+    return (
+      <div
+        className="flex min-h-[140px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-5 text-center text-xs"
+        style={{
+          borderColor: WINDOW_META.flowers.colors.border,
+          color: PALETTE.textLight,
+        }}
+      >
+        Missing file
+        <span className="text-[10px]">{entry.file}</span>
+      </div>
+    )
+  }
+
+  return (
+    <figure className="overflow-hidden rounded-xl border-2" style={{ borderColor: WINDOW_META.flowers.colors.border }}>
+      <img src={src} alt={entry.alt ?? 'Flower photo'} className="h-full w-full object-contain bg-white" />
+    </figure>
+  )
+}
+
 function PhotoEntry({ entry }) {
   if (entry.type === 'text') {
     return (
@@ -1897,6 +2096,20 @@ function PhotoIcon({ main = PALETTE.sunshine, accent = PALETTE.accent, detail = 
       <rect x="3" y="3" width="18" height="18" stroke={detail} strokeWidth="2" fill={main}/>
       <circle cx="8" cy="8" r="2" fill={detail}/>
       <path d="M21 15L16 10L5 21H21V15Z" fill={accent} stroke={detail} strokeWidth="1.5"/>
+    </svg>
+  )
+}
+
+function FlowerIcon({ main = PALETTE.peach, accent = '#ffffff', detail = '#8a4a32' }) {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="9" fill={main} stroke={detail} strokeWidth="2" />
+      <circle cx="12" cy="7" r="3" fill={accent} stroke={detail} strokeWidth="1.2" />
+      <circle cx="7" cy="12" r="3" fill={accent} stroke={detail} strokeWidth="1.2" />
+      <circle cx="12" cy="17" r="3" fill={accent} stroke={detail} strokeWidth="1.2" />
+      <circle cx="17" cy="12" r="3" fill={accent} stroke={detail} strokeWidth="1.2" />
+      <circle cx="12" cy="12" r="2" fill={detail} />
+      <path d="M12 21V18" stroke={detail} strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }

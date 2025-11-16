@@ -1,0 +1,38 @@
+{
+  "pages": [
+    {
+      "id": "tulip-morning",
+      "title": "Tulip Morning",
+      "showTitle": true,
+      "caption": "Swap these entries to match each bouquet's story.",
+      "entries": [
+        {
+          "type": "text",
+          "content": "Use this JSON file to pair each arrangement with a note or dedication."
+        },
+        {
+          "type": "image",
+          "file": "placeholder-bouquet.svg",
+          "alt": "Pink bouquet placeholder"
+        }
+      ]
+    },
+    {
+      "id": "starlight-bouquet",
+      "title": "",
+      "showTitle": false,
+      "caption": "Pixel bouquets look extra cute with transparent PNGs!",
+      "entries": [
+        {
+          "type": "image",
+          "file": "placeholder-bouquet.svg",
+          "alt": "Placeholder bouquet"
+        },
+        {
+          "type": "text",
+          "content": "Duplicate this page to add more arrangements."
+        }
+      ]
+    }
+  ]
+}
