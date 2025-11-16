@@ -1,0 +1,21 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fce1ff" />
+      <stop offset="50%" stop-color="#c8e0ff" />
+      <stop offset="100%" stop-color="#ffe7d9" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fb8aff" />
+      <stop offset="50%" stop-color="#8ac6ff" />
+      <stop offset="100%" stop-color="#ffd58a" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#grad1)" />
+  <circle cx="650" cy="120" r="80" fill="#fff6d6" opacity="0.8" />
+  <path d="M0 420 Q200 360 400 420 T800 420 V600 H0 Z" fill="url(#grad2)" opacity="0.75" />
+  <path d="M0 480 Q200 420 400 480 T800 480 V600 H0 Z" fill="#fff" opacity="0.25" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="'Courier New', monospace" font-size="36" fill="#4b3f75" opacity="0.6">
+    Add your own photo
+  </text>
+</svg>
