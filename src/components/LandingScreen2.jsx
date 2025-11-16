@@ -78,17 +78,17 @@ export default function AlinaOSBoot({
         '> Clearing Cache',
         '> Loading Critical Systems...',
         '> Verifying System Integrity',
-        '> Inititialisation Complete. Press Enter to Continue.'
+        '> Inititialisation Complete.'
       ]
     : [
         '> Initialising...',
         '> Checking ABPP Protocol...',
         '> Making sure everything is perfect...',
         '> Optimising the OS...',
-        '> The OS is Ready. Press Enter to Continue.'
+        '> The OS is Ready.'
       ];
 
-  const taglineText = theme === 'dark' ? null : 'Made by Wallu';
+  const taglineText = theme === 'dark' ? null : 'For Allu, by Wallu ♥';
 
   return (
     <>
