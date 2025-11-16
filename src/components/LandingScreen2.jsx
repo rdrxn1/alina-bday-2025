@@ -43,7 +43,9 @@ export default function AlinaOSBoot({
       dotColor: '%23ff0000',
       logoColor: '#ffffff',
       logoShadow: '#ff0000',
-      versionColor: '#ff3333',
+      versionColor: '#ff0000',
+      versionBg: 'rgba(255, 0, 0, 0.1)',
+      versionBorder: '#ff3333',
       textColor: '#ff6666',
       accentColor: '#ff0000',
       btnBg: 'linear-gradient(180deg, #ff3333 0%, #cc0000 100%)',
@@ -55,7 +57,9 @@ export default function AlinaOSBoot({
       dotColor: '%23ff85bb',
       logoColor: '#ffffff',
       logoShadow: '#ff9fcf',
-      versionColor: '#ff9fcf',
+      versionColor: '#ff85bb',
+      versionBg: 'rgba(255, 159, 207, 0.2)',
+      versionBorder: '#ff9fcf',
       textColor: '#8a6ba0',
       accentColor: '#ff9fcf',
       btnBg: 'linear-gradient(180deg, #ffc6df 0%, #ff9fcf 100%)',
@@ -185,13 +189,31 @@ export default function AlinaOSBoot({
 
         .version {
           font-family: 'VT323', monospace;
-          font-size: 2rem;
+          font-size: 4.5rem;
+          font-weight: 700;
           color: ${currentTheme.versionColor};
-          letter-spacing: 0.1em;
-          margin-top: -2rem;
+          letter-spacing: 0.3em;
+          margin-top: -1.5rem;
+          text-shadow: 
+            0 0 30px ${theme === 'dark' ? 'rgba(255, 0, 0, 0.8)' : 'rgba(255, 159, 207, 0.8)'},
+            0 0 60px ${theme === 'dark' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(255, 159, 207, 0.5)'};
           opacity: 0;
-          animation: fadeIn 0.6s ease-out forwards;
+          animation: versionPulse 0.8s ease-out forwards;
           animation-delay: 0.6s;
+        }
+
+        @keyframes versionPulse {
+          0% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
 
         @keyframes fadeIn {
@@ -337,7 +359,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.5rem;
+            font-size: 3.5rem;
           }
 
           .boot-messages {
@@ -370,7 +392,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.2rem;
+            font-size: 2.8rem;
           }
 
           .boot-messages {
@@ -408,7 +430,7 @@ export default function AlinaOSBoot({
           }
 
           .version {
-            font-size: 1.3rem;
+            font-size: 3rem;
             margin-top: -1rem;
           }
 
