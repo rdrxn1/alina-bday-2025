@@ -104,11 +104,11 @@ const WINDOW_META = {
   },
   email: {
     title: 'BIRTHDAY_MAIL.EML',
-    width: 440,
+    width: 360,
     colors: {
-      border: PALETTE.lavender,
-      background: '#f6f2ff',
-      titleBar: PALETTE.lavender,
+      border: PALETTE.mint,
+      background: '#effcf7',
+      titleBar: PALETTE.mint,
     },
     taskLabel: 'Email',
   },
@@ -151,12 +151,12 @@ const ICON_STYLES = Object.freeze({
   email: {
     tileBg: WINDOW_META.email.colors.titleBar,
     tileBorder: WINDOW_META.email.colors.border,
-    labelBg: '#f7f3ff',
+    labelBg: '#f0fff8',
     labelBorder: WINDOW_META.email.colors.border,
     icon: {
       main: WINDOW_META.email.colors.titleBar,
       accent: '#ffffff',
-      detail: '#4a3c6d',
+      detail: '#3c6253',
     },
   },
 })
@@ -557,8 +557,8 @@ function useDesktopMusicPlayer(tracks) {
 }
 
 const INITIAL_WINDOWS = {
-  email: { x: 480, y: 260, width: 440, height: 520, zIndex: 5, status: 'closed', maximized: false },
-  music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
+  email: { x: 540, y: 320, width: 720, height: 820, zIndex: 5, status: 'open', maximized: false },
+  music: { x: 550, y: 40, width: 500, height: 570, zIndex: 4, status: 'open', maximized: false },
   about: { x: 210, y: 210, width: 320, height: 300, zIndex: 3, status: 'open', maximized: false },
   photos: { x: 120, y: 420, width: 300, height: 280, zIndex: 2, status: 'open', maximized: false },
 }
@@ -580,8 +580,19 @@ function Y2KBirthdayDesktop() {
   useEffect(() => {
     if (!mailUnread) {
       setMailAlertVisible(false)
+      return
     }
-  }, [mailUnread])
+
+    if (!mailAlertVisible) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setMailAlertVisible(false)
+    }, 5000)
+
+    return () => clearTimeout(timer)
+  }, [mailUnread, mailAlertVisible])
 
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
@@ -763,7 +774,6 @@ function Y2KBirthdayDesktop() {
             icon={<MailIcon {...ICON_STYLES.email.icon} />}
             label="EMAIL"
             colors={ICON_STYLES.email}
-            badge={mailUnread ? '1' : null}
             onClick={() => handleIconClick('email')}
           />
           <DesktopIcon
@@ -787,6 +797,21 @@ function Y2KBirthdayDesktop() {
         </aside>
 
         {windows.email.status === 'open' && (
+          <Window
+            windowKey="email"
+            data={windows.email}
+            meta={WINDOW_META.email}
+            onMouseDown={handleWindowMouseDown}
+            onResizeStart={handleResizeMouseDown}
+            onMinimize={handleMinimize}
+            onMaximize={handleMaximize}
+            onClose={handleClose}
+          >
+            <EmailContent />
+          </Window>
+        )}
+
+        {windows.chat.status === 'open' && (
           <Window
             windowKey="email"
             data={windows.email}
@@ -957,6 +982,118 @@ function EmailContent() {
   const bulletPrefixes = ['🌷', '💌', '🎧', '📸', '🎂', '🕊️']
   const blocks = EMAIL_CONTENT.message.split('\n\n')
 
+  return (
+    <div className="flex h-full flex-col gap-4 p-4" style={{ color: PALETTE.text }}>
+      <div
+        className="flex items-center justify-between gap-3 rounded-xl border-2 px-4 py-3"
+        style={{
+          backgroundColor: '#f4fff9',
+          borderColor: WINDOW_META.email.colors.border,
+          boxShadow: '0 12px 24px rgba(174, 232, 206, 0.25)',
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-lg border-2"
+            style={{
+              backgroundColor: WINDOW_META.email.colors.titleBar,
+              borderColor: WINDOW_META.email.colors.border,
+            }}
+          >
+            <MailIcon {...ICON_STYLES.email.icon} />
+          </div>
+          <div className="text-xs font-mono leading-tight">
+            <div className="font-bold uppercase tracking-[0.35em]" style={{ color: PALETTE.textLight }}>
+              From: Waleed
+            </div>
+            <div className="text-sm font-semibold" style={{ color: PALETTE.text }}>
+              Subject: {EMAIL_CONTENT.subject}
+            </div>
+          </div>
+        </div>
+        <div
+          className="rounded-full border-2 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.3em]"
+          style={{
+            backgroundColor: '#ffffff',
+            borderColor: WINDOW_META.email.colors.border,
+            color: PALETTE.text,
+          }}
+        >
+          Inbox
+        </div>
+      </div>
+
+      <div
+        className="flex-1 space-y-5 overflow-y-auto rounded-2xl border-2 p-5 custom-scroll"
+        style={{
+          borderColor: WINDOW_META.email.colors.border,
+          background: 'linear-gradient(180deg, #ffffff 0%, #f0fff8 100%)',
+          boxShadow: '0 18px 40px rgba(90, 61, 122, 0.12)',
+        }}
+      >
+        {blocks.map((block, blockIndex) => {
+          const lines = block.split('\n').filter(Boolean)
+          if (lines.length === 0) {
+            return null
+          }
+
+          const hasList =
+            lines.length > 1 &&
+            lines.slice(1).every((line) => bulletPrefixes.some((prefix) => line.trim().startsWith(prefix)))
+
+          if (hasList) {
+            return (
+              <div key={blockIndex} className="space-y-2">
+                <p className="text-sm font-semibold" style={{ color: PALETTE.text }}>
+                  {lines[0]}
+                </p>
+                <ul className="space-y-1.5 text-sm font-mono" style={{ color: PALETTE.text }}>
+                  {lines.slice(1).map((line, index) => {
+                    const trimmed = line.trim()
+                    const firstSpace = trimmed.indexOf(' ')
+                    const icon = firstSpace >= 0 ? trimmed.slice(0, firstSpace) : trimmed
+                    const text = firstSpace >= 0 ? trimmed.slice(firstSpace + 1).trim() : ''
+                    return (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-base">{icon}</span>
+                        <span className="flex-1 leading-relaxed">{text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          }
+
+          return (
+            <p key={blockIndex} className="text-sm leading-relaxed" style={{ color: PALETTE.text }}>
+              {lines.map((line, lineIndex) => (
+                <span key={lineIndex}>
+                  {line}
+                  {lineIndex < lines.length - 1 && <br />}
+                </span>
+              ))}
+            </p>
+          )
+        })}
+
+        <div className="rounded-xl border-2 px-4 py-3 text-sm" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
+          <div className="font-semibold" style={{ color: PALETTE.text }}>
+            With all my love,
+          </div>
+          <div className="text-base font-bold" style={{ color: PALETTE.text }}>
+            Waleed
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.4em]" style={{ color: PALETTE.textLight }}>
+            November 2025
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ChatContent() {
   return (
     <div className="flex h-full flex-col gap-5 p-5" style={{ color: PALETTE.text }}>
       <div
@@ -1510,34 +1647,30 @@ function PhotosContent() {
   )
 }
 
-function MailNotification({ onDismiss, onOpen }) {
+function MailNotification({ onDismiss }) {
   return (
     <div
-      className="absolute right-10 top-10 flex max-w-xs cursor-pointer flex-col gap-2 rounded-2xl border-4 px-5 py-4 shadow-lg"
+      className="absolute right-12 bottom-24 flex max-w-xs cursor-pointer flex-col gap-2 rounded-xl border-4 px-5 py-4 shadow-lg"
       style={{
         backgroundColor: PALETTE.windowBg,
         borderColor: WINDOW_META.email.colors.border,
         color: PALETTE.text,
-        boxShadow: '0 18px 30px rgba(116, 96, 164, 0.25)',
-        zIndex: 999,
+        boxShadow: '0 18px 30px rgba(60, 98, 83, 0.22)',
       }}
-      onClick={() => {
-        onOpen?.()
-        onDismiss?.()
-      }}
+      onClick={onDismiss}
     >
-      <div className="flex items-center gap-3 text-base font-semibold tracking-wide">
+      <div className="flex items-center gap-3 text-sm font-semibold tracking-wide">
         <MailIcon {...ICON_STYLES.email.icon} />
         YOU'VE GOT MAIL!
       </div>
-      <div className="text-sm font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
-        Tap here to jump straight into your birthday inbox.
+      <div className="text-xs font-mono leading-relaxed" style={{ color: PALETTE.textLight }}>
+        Click the EMAIL icon to read your birthday message.
       </div>
       <div
-        className="self-end text-[11px] font-semibold tracking-[0.4em]"
+        className="self-end text-[10px] font-semibold tracking-[0.35em]"
         style={{ color: WINDOW_META.email.colors.border }}
       >
-        OPEN MAIL
+        TAP TO DISMISS
       </div>
     </div>
   )
@@ -1569,10 +1702,10 @@ function DesktopIcon({ icon, label, onClick, colors, badge }) {
           <span
             className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold"
             style={{
-              backgroundColor: '#ff4d6d',
-              borderColor: '#b3132c',
-              color: '#fff4f7',
-              boxShadow: '0 6px 12px rgba(179, 19, 44, 0.4)',
+              backgroundColor: WINDOW_META.email.colors.titleBar,
+              borderColor: WINDOW_META.email.colors.border,
+              color: PALETTE.text,
+              boxShadow: '0 6px 12px rgba(60, 98, 83, 0.35)',
             }}
           >
             {badge}
@@ -1860,7 +1993,19 @@ function MiniMusicControls({ player, palette, onRestore }) {
 }
 
 // SVG Icons
-function MailIcon({ main = PALETTE.lavender, accent = '#ffffff', detail = '#4a3c6d' }) {
+function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.text }) {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={detail} strokeWidth="2" fill={main} />
+      <path d="M4 6L12 13L20 6" stroke={detail} strokeWidth="2" fill="none" />
+      <path d="M4 19L10.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <path d="M20 19L13.5 12.5" stroke={detail} strokeWidth="1.5" />
+      <rect x="7" y="8" width="10" height="3" fill={accent} stroke={detail} strokeWidth="1" />
+    </svg>
+  )
+}
+
+function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <rect x="3" y="5" width="18" height="14" rx="2" stroke={detail} strokeWidth="2" fill={main} />
