@@ -18,7 +18,6 @@ import terePyarSrc from '../assets/music/Kaavish - Tere Pyar Main.mp3'
 import daydreamingSrc from '../assets/music/Radiohead - Daydreaming.mp3'
 import fakePlasticSrc from '../assets/music/Radiohead - Fake Plastic Trees.mp3'
 import motionPictureSrc from '../assets/music/Radiohead - Motion Picture Soundtrack.mp3'
-
 const PALETTE = Object.freeze({
   bg: '#ffe6f2',
   bgAlt: '#ffd8e9',
@@ -37,40 +36,32 @@ const PALETTE = Object.freeze({
   lavender: '#c7b9ff',
   peach: '#ffbfa4',
 })
-
 const DOT_PATTERN = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><circle cx='2.5' cy='2.5' r='1.2' fill='%23${PALETTE.border.slice(1)}'/></svg>")`;
-
 const SCROLLBAR_STYLES = `
   .custom-scroll {
     scrollbar-width: thin;
     scrollbar-color: ${PALETTE.primary} ${PALETTE.windowBg};
   }
-
   .custom-scroll::-webkit-scrollbar {
     width: 12px;
   }
-
   .custom-scroll::-webkit-scrollbar-track {
     background: ${PALETTE.windowBg};
     border-left: 2px solid ${PALETTE.border};
     border-right: 2px solid ${PALETTE.border};
   }
-
   .custom-scroll::-webkit-scrollbar-thumb {
     background: ${PALETTE.primary};
     border-radius: 8px;
     border: 3px solid ${PALETTE.windowBg};
   }
-
   .custom-scroll::-webkit-scrollbar-thumb:hover {
     background: ${PALETTE.secondary};
   }
-
   .custom-scroll::-webkit-scrollbar-corner {
     background: ${PALETTE.windowBg};
   }
 `
-
 const WINDOW_META = {
   chat: {
     title: 'MY_COOL_CHAT.EXE',
@@ -123,7 +114,6 @@ const WINDOW_META = {
     taskLabel: 'Email',
   },
 }
-
 const ICON_STYLES = Object.freeze({
   music: {
     tileBg: WINDOW_META.music.colors.titleBar,
@@ -181,7 +171,6 @@ const ICON_STYLES = Object.freeze({
     },
   },
 })
-
 const TRACKS = Object.freeze([
   {
     id: 'let-down',
@@ -317,15 +306,11 @@ const TRACKS = Object.freeze([
     display: 'Motion Picture Soundtrack - Radiohead',
   },
 ])
-
 const EMAIL_CONTENT = Object.freeze({
   subject: 'Welcome to Your Birthday Site',
   message: `Hey Alina,
-
 I wanted to create something special for you this year—a little corner of the internet that's just yours. This site is a journal, a memory box, a love letter, all wrapped into one.
-
 Every year on your birthday, I'll update it with new memories, messages, and moments we've shared. Think of it as a growing timeline of us—a place where I can remind you how much you mean to me, even when the world feels heavy.
-
 Inside, you'll find:
 🌷 Memories - moments that live rent-free in my heart
 💌 Messages - journal entries about you, for you
@@ -333,21 +318,16 @@ Inside, you'll find:
 📸 Moments - your favorite things (because you deserve them all)
 🎂 Birthday - a little ritual just for today
 🕊️ For You - because everything beautiful reminds me of you
-
 This is your space, Alina. A reminder that you are loved, seen, and celebrated—not just today, but every single day.
-
 I hope this brings you a little joy, a little comfort, and a lot of smiles. You deserve all the softness the world can offer.
-
 Happy birthday, my love. Here's to another year of us.`,
 })
-
 const formatTime = (value) => {
   if (!Number.isFinite(value) || value < 0) return '0:00'
   const minutes = Math.floor(value / 60)
   const seconds = Math.floor(value % 60)
   return `${minutes}:${seconds.toString().padStart(2, '0')}`
 }
-
 function useDesktopMusicPlayer(tracks) {
   const audioRef = useRef(null)
   const analyserRef = useRef(null)
@@ -358,28 +338,22 @@ function useDesktopMusicPlayer(tracks) {
   const [duration, setDuration] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
-
   const currentTrack = tracks[currentIndex]
-
   // Set up Web Audio API for visualization
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-
     // Initialize audio context and analyser on first play
     const setupAudioContext = () => {
       if (audioContextRef.current) return // Already set up
-
       try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)()
         const analyser = audioContext.createAnalyser()
         analyser.fftSize = 256
         analyser.smoothingTimeConstant = 0.8
-
         const source = audioContext.createMediaElementSource(audio)
         source.connect(analyser)
         analyser.connect(audioContext.destination)
-
         audioContextRef.current = audioContext
         analyserRef.current = analyser
         sourceRef.current = source
@@ -387,17 +361,14 @@ function useDesktopMusicPlayer(tracks) {
         console.warn('Web Audio API not supported', error)
       }
     }
-
     audio.addEventListener('play', setupAudioContext)
     return () => {
       audio.removeEventListener('play', setupAudioContext)
     }
   }, [])
-
   const safePlay = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return Promise.resolve(false)
-
     try {
       const playPromise = audio.play()
       if (playPromise && typeof playPromise.then === 'function') {
@@ -422,46 +393,37 @@ function useDesktopMusicPlayer(tracks) {
       return Promise.resolve(false)
     }
   }, [])
-
   const pause = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
     audio.pause()
   }, [])
-
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return undefined
-
     const handleLoaded = () => {
       setDuration(audio.duration || 0)
     }
-
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime || 0)
     }
-
     const handlePlayEvent = () => {
       setIsPlaying(true)
       setAutoplayBlocked(false)
     }
-
     const handlePauseEvent = () => {
       setIsPlaying(false)
     }
-
     const handleEndedEvent = () => {
       setCurrentTime(0)
       setIsPlaying(false)
       setCurrentIndex(prev => (prev + 1) % tracks.length)
     }
-
     audio.addEventListener('loadedmetadata', handleLoaded)
     audio.addEventListener('timeupdate', handleTimeUpdate)
     audio.addEventListener('play', handlePlayEvent)
     audio.addEventListener('pause', handlePauseEvent)
     audio.addEventListener('ended', handleEndedEvent)
-
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoaded)
       audio.removeEventListener('timeupdate', handleTimeUpdate)
@@ -470,38 +432,31 @@ function useDesktopMusicPlayer(tracks) {
       audio.removeEventListener('ended', handleEndedEvent)
     }
   }, [tracks.length])
-
   useEffect(() => {
     const audio = audioRef.current
     if (!audio || !currentTrack) return undefined
-
     audio.pause()
     audio.currentTime = 0
     setCurrentTime(0)
     setDuration(0)
     audio.volume = 0.75
-
     const handleLoaded = () => {
       setDuration(audio.duration || 0)
       safePlay()
     }
-
     audio.addEventListener('loadedmetadata', handleLoaded)
     try {
       audio.load()
     } catch (error) {
       // Ignore load errors for browsers that don't require it.
     }
-
     if (audio.readyState >= 1) {
       handleLoaded()
     }
-
     return () => {
       audio.removeEventListener('loadedmetadata', handleLoaded)
     }
   }, [currentTrack, safePlay])
-
   const seekTo = useCallback((fraction) => {
     const audio = audioRef.current
     if (!audio) return
@@ -511,7 +466,6 @@ function useDesktopMusicPlayer(tracks) {
     audio.currentTime = clamped * targetDuration
     setCurrentTime(audio.currentTime || 0)
   }, [duration])
-
   const selectTrack = useCallback((index) => {
     if (index < 0 || index >= tracks.length) return
     setCurrentIndex(prev => {
@@ -526,15 +480,12 @@ function useDesktopMusicPlayer(tracks) {
       return index
     })
   }, [safePlay, tracks.length])
-
   const next = useCallback(() => {
     setCurrentIndex(prev => (prev + 1) % tracks.length)
   }, [tracks.length])
-
   const prev = useCallback(() => {
     setCurrentIndex(prev => (prev - 1 + tracks.length) % tracks.length)
   }, [tracks.length])
-
   const togglePlay = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -544,7 +495,6 @@ function useDesktopMusicPlayer(tracks) {
       pause()
     }
   }, [pause, safePlay])
-
   const stop = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
@@ -554,9 +504,7 @@ function useDesktopMusicPlayer(tracks) {
     setIsPlaying(false)
     setAutoplayBlocked(false)
   }, [])
-
   const progressPercent = duration ? Math.min(100, (currentTime / duration) * 100) : 0
-
   return {
     audioRef,
     analyserRef,
@@ -576,7 +524,6 @@ function useDesktopMusicPlayer(tracks) {
     safePlay,
   }
 }
-
 const INITIAL_WINDOWS = {
   email: { x: 540, y: 320, width: 360, height: 420, zIndex: 5, status: 'open', maximized: false },
   music: { x: 450, y: 70, width: 400, height: 520, zIndex: 4, status: 'open', maximized: false },
@@ -598,31 +545,25 @@ function Y2KBirthdayDesktop() {
   const containerRef = useRef(null)
   const musicPlayer = useDesktopMusicPlayer(TRACKS)
   const { stop: stopMusic } = musicPlayer
-
   useEffect(() => {
     if (!mailUnread) {
       setMailAlertVisible(false)
       return
     }
-
     if (!mailAlertVisible) {
       return
     }
-
     const timer = setTimeout(() => {
       setMailAlertVisible(false)
     }, 5000)
-
     return () => clearTimeout(timer)
   }, [mailUnread, mailAlertVisible])
-
   const bringToFront = useCallback((key) => {
     setWindows(prev => {
       const maxZ = Math.max(...Object.values(prev).map(w => w.zIndex))
       return { ...prev, [key]: { ...prev[key], zIndex: maxZ + 1 } }
     })
   }, [])
-
   const handleWindowMouseDown = useCallback((e, key) => {
     if (e.button !== 0) return
     if (e.target.closest('.window-controls') || e.target.closest('.resize-handle')) return
@@ -630,10 +571,8 @@ function Y2KBirthdayDesktop() {
     
     const win = windows[key]
     if (win.maximized) return
-
     e.preventDefault()
     bringToFront(key)
-
     const rect = e.currentTarget.getBoundingClientRect()
     setDragState({
       key,
@@ -641,15 +580,12 @@ function Y2KBirthdayDesktop() {
       offsetY: e.clientY - rect.top,
     })
   }, [windows, bringToFront])
-
   const handleResizeMouseDown = useCallback((e, key) => {
     if (e.button !== 0) return
     e.preventDefault()
     e.stopPropagation()
-
     const win = windows[key]
     if (win.maximized) return
-
     bringToFront(key)
     setResizeState({
       key,
@@ -659,21 +595,17 @@ function Y2KBirthdayDesktop() {
       startHeight: win.height,
     })
   }, [windows, bringToFront])
-
   const handleMouseMove = useCallback((e) => {
     if (dragState) {
       const container = containerRef.current
       if (!container) return
-
       const containerRect = container.getBoundingClientRect()
       const win = windows[dragState.key]
       
       let newX = e.clientX - dragState.offsetX
       let newY = e.clientY - dragState.offsetY
-
       newX = Math.max(0, Math.min(newX, containerRect.width - win.width))
       newY = Math.max(0, Math.min(newY, containerRect.height - 50 - win.height))
-
       setWindows(prev => ({
         ...prev,
         [dragState.key]: { ...prev[dragState.key], x: newX, y: newY }
@@ -684,29 +616,24 @@ function Y2KBirthdayDesktop() {
       
       const newWidth = Math.max(220, resizeState.startWidth + deltaX)
       const newHeight = Math.max(200, resizeState.startHeight + deltaY)
-
       setWindows(prev => ({
         ...prev,
         [resizeState.key]: { ...prev[resizeState.key], width: newWidth, height: newHeight }
       }))
     }
   }, [dragState, resizeState, windows])
-
   const handleMouseUp = useCallback(() => {
     setDragState(null)
     setResizeState(null)
   }, [])
-
   const handleMinimize = useCallback((key) => {
     setWindows(prev => ({ ...prev, [key]: { ...prev[key], status: 'minimized' } }))
   }, [])
-
   const handleMaximize = useCallback((key) => {
     setWindows(prev => {
       const win = prev[key]
       const container = containerRef.current
       if (!container) return prev
-
       const rect = container.getBoundingClientRect()
       
       if (win.maximized) {
@@ -722,7 +649,6 @@ function Y2KBirthdayDesktop() {
           }
         }
       }
-
       return {
         ...prev,
         [key]: {
@@ -740,14 +666,12 @@ function Y2KBirthdayDesktop() {
       }
     })
   }, [])
-
   const handleClose = useCallback((key) => {
     setWindows(prev => ({ ...prev, [key]: { ...prev[key], status: 'closed' } }))
     if (key === 'music') {
       stopMusic()
     }
   }, [stopMusic])
-
   const handleRestore = useCallback((key) => {
     setStartOpen(false)
     if (key === 'email') {
@@ -759,19 +683,15 @@ function Y2KBirthdayDesktop() {
       return { ...prev, [key]: { ...prev[key], status: 'open', maximized: false, zIndex: maxZ + 1 } }
     })
   }, [setMailAlertVisible, setMailUnread])
-
   const handleIconClick = useCallback((key) => {
     handleRestore(key)
   }, [handleRestore])
-
   const minimizedWindows = Object.entries(windows)
     .filter(([, w]) => w.status === 'minimized')
     .map(([key]) => key)
-
   const closedWindows = Object.entries(windows)
     .filter(([, w]) => w.status === 'closed')
     .map(([key]) => key)
-
   return (
     <>
       <style>{SCROLLBAR_STYLES}</style>
@@ -790,7 +710,6 @@ function Y2KBirthdayDesktop() {
       >
         <DotGrid />
         <FloatingShapes />
-
         <aside className="absolute left-5 top-8 flex flex-col gap-6">
           <DesktopIcon
             icon={<MailIcon {...ICON_STYLES.email.icon} />}
@@ -823,7 +742,6 @@ function Y2KBirthdayDesktop() {
             onClick={() => handleIconClick('photos')}
           />
         </aside>
-
         {windows.email.status === 'open' && (
           <Window
             windowKey="email"
@@ -838,7 +756,6 @@ function Y2KBirthdayDesktop() {
             <EmailContent />
           </Window>
         )}
-
         {windows.chat.status === 'open' && (
           <Window
             windowKey="chat"
@@ -853,7 +770,6 @@ function Y2KBirthdayDesktop() {
             <ChatContent />
           </Window>
         )}
-
         {windows.music.status === 'open' && (
           <Window
             windowKey="music"
@@ -868,7 +784,6 @@ function Y2KBirthdayDesktop() {
             <MusicContent player={musicPlayer} />
           </Window>
         )}
-
         {windows.about.status === 'open' && (
           <Window
             windowKey="about"
@@ -883,7 +798,6 @@ function Y2KBirthdayDesktop() {
             <AboutContent />
           </Window>
         )}
-
         {windows.photos.status === 'open' && (
           <Window
             windowKey="photos"
@@ -898,14 +812,12 @@ function Y2KBirthdayDesktop() {
             <PhotosContent />
           </Window>
         )}
-
         <audio
           ref={musicPlayer.audioRef}
           src={musicPlayer.currentTrack?.src}
           preload="metadata"
           className="hidden"
         />
-
         <Taskbar
           minimizedWindows={minimizedWindows}
           closedWindows={closedWindows}
@@ -920,7 +832,6 @@ function Y2KBirthdayDesktop() {
     </>
   )
 }
-
 function Window({ windowKey, data, meta, onMouseDown, onResizeStart, onMinimize, onMaximize, onClose, children }) {
   const style = {
     left: `${data.x}px`,
@@ -929,7 +840,6 @@ function Window({ windowKey, data, meta, onMouseDown, onResizeStart, onMinimize,
     height: `${data.height}px`,
     zIndex: data.zIndex,
   }
-
   return (
     <div
       className="absolute flex flex-col"
@@ -998,11 +908,9 @@ function Window({ windowKey, data, meta, onMouseDown, onResizeStart, onMinimize,
     </div>
   )
 }
-
 function EmailContent() {
   const bulletPrefixes = ['🌷', '💌', '🎧', '📸', '🎂', '🕊️']
   const blocks = EMAIL_CONTENT.message.split('\n\n')
-
   return (
     <div className="flex h-full flex-col gap-4 p-4" style={{ color: PALETTE.text }}>
       <div
@@ -1043,7 +951,6 @@ function EmailContent() {
           Inbox
         </div>
       </div>
-
       <div
         className="flex-1 space-y-5 overflow-y-auto rounded-2xl border-2 p-5 custom-scroll"
         style={{
@@ -1057,11 +964,9 @@ function EmailContent() {
           if (lines.length === 0) {
             return null
           }
-
           const hasList =
             lines.length > 1 &&
             lines.slice(1).every((line) => bulletPrefixes.some((prefix) => line.trim().startsWith(prefix)))
-
           if (hasList) {
             return (
               <div key={blockIndex} className="space-y-2">
@@ -1085,7 +990,6 @@ function EmailContent() {
               </div>
             )
           }
-
           return (
             <p key={blockIndex} className="text-sm leading-relaxed" style={{ color: PALETTE.text }}>
               {lines.map((line, lineIndex) => (
@@ -1097,7 +1001,6 @@ function EmailContent() {
             </p>
           )
         })}
-
         <div className="rounded-xl border-2 px-4 py-3 text-sm" style={{ borderColor: PALETTE.border, backgroundColor: '#fff1f8' }}>
           <div className="font-semibold" style={{ color: PALETTE.text }}>
             With all my love,
@@ -1113,7 +1016,6 @@ function EmailContent() {
     </div>
   )
 }
-
 function ChatContent() {
   return (
     <div className="p-4 space-y-3 text-sm">
@@ -1166,20 +1068,16 @@ function ChatContent() {
     </div>
   )
 }
-
 function MusicVisualizer({ analyserRef, isPlaying }) {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
-
   useEffect(() => {
     const canvas = canvasRef.current
     const analyser = analyserRef.current
     if (!canvas || !analyser) return
-
     const ctx = canvas.getContext('2d')
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
-
     const setCanvasSize = () => {
       const rect = canvas.getBoundingClientRect()
       const dpr = window.devicePixelRatio || 1
@@ -1187,38 +1085,30 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
       canvas.height = rect.height * dpr
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
-
     setCanvasSize()
-
     const resizeObserver =
       typeof window !== 'undefined' && 'ResizeObserver' in window
         ? new ResizeObserver(() => {
             setCanvasSize()
           })
         : null
-
     if (resizeObserver) {
       resizeObserver.observe(canvas)
     }
-
     const handleWindowResize = () => {
       setCanvasSize()
     }
-
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', handleWindowResize)
     }
-
     const draw = () => {
       const dpr = window.devicePixelRatio || 1
       const width = canvas.width / dpr
       const height = canvas.height / dpr
       const centerY = height / 2
-
       // Clear with background
       ctx.fillStyle = '#e8f7ff'
       ctx.fillRect(0, 0, width, height)
-
       if (!isPlaying) {
         // Draw static centerline when paused
         ctx.strokeStyle = PALETTE.secondary + '40'
@@ -1229,19 +1119,15 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
         ctx.stroke()
         return
       }
-
       analyser.getByteFrequencyData(dataArray)
-
       // Draw traditional waveform
       const barCount = 80
       const barWidth = width / barCount
       const barGap = 1
       const maxBarHeight = height / 2 - 10
-
       // Sample mainly from lower frequencies (where most music energy is)
       // Use only first 60% of frequency data for better visualization
       const usableBufferLength = Math.floor(bufferLength * 0.6)
-
       // Draw bars mirrored from center
       for (let i = 0; i < barCount; i++) {
         // Map bar index to frequency data with emphasis on lower frequencies
@@ -1249,30 +1135,24 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
         const dataIndex = Math.floor(normalizedIndex * usableBufferLength)
         const value = dataArray[dataIndex] / 255
         const barHeight = value * maxBarHeight
-
         const x = i * barWidth
         const actualBarWidth = barWidth - barGap
-
         // Create gradient for each bar
         const topGradient = ctx.createLinearGradient(x, centerY - barHeight, x, centerY)
         topGradient.addColorStop(0, PALETTE.secondary)
         topGradient.addColorStop(0.6, PALETTE.accent)
         topGradient.addColorStop(1, PALETTE.lavender + '60')
-
         const bottomGradient = ctx.createLinearGradient(x, centerY, x, centerY + barHeight)
         bottomGradient.addColorStop(0, PALETTE.lavender + '60')
         bottomGradient.addColorStop(0.4, PALETTE.accent)
         bottomGradient.addColorStop(1, PALETTE.secondary)
-
         // Draw top half (above center)
         ctx.fillStyle = topGradient
         ctx.fillRect(x, centerY - barHeight, actualBarWidth, barHeight)
-
         // Draw bottom half (below center)
         ctx.fillStyle = bottomGradient
         ctx.fillRect(x, centerY, actualBarWidth, barHeight)
       }
-
       // Draw subtle center line
       ctx.strokeStyle = PALETTE.secondary + '30'
       ctx.lineWidth = 1
@@ -1280,15 +1160,12 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
       ctx.moveTo(0, centerY)
       ctx.lineTo(width, centerY)
       ctx.stroke()
-
       animationRef.current = requestAnimationFrame(draw)
     }
-
     draw()
     if (isPlaying) {
       animationRef.current = requestAnimationFrame(draw)
     }
-
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current)
@@ -1301,7 +1178,6 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
       }
     }
   }, [analyserRef, isPlaying])
-
   return (
     <div
       className="rounded-lg border-2 overflow-hidden"
@@ -1319,11 +1195,9 @@ function MusicVisualizer({ analyserRef, isPlaying }) {
     </div>
   )
 }
-
 function MusicContent({ player }) {
   const [isDragging, setIsDragging] = useState(false)
   const progressBarRef = useRef(null)
-
   if (!player || !player.currentTrack) {
     return (
       <div
@@ -1334,7 +1208,6 @@ function MusicContent({ player }) {
       </div>
     )
   }
-
   const {
     currentTrack,
     progressPercent,
@@ -1350,7 +1223,6 @@ function MusicContent({ player }) {
     currentIndex,
     analyserRef,
   } = player
-
   const handleSeek = useCallback((event) => {
     if (!duration) return
     const bounds = progressBarRef.current?.getBoundingClientRect()
@@ -1359,32 +1231,25 @@ function MusicContent({ player }) {
     const percent = Math.min(Math.max(offset / bounds.width, 0), 1)
     seekTo(percent)
   }, [duration, seekTo])
-
   const handleMouseDown = useCallback((event) => {
     setIsDragging(true)
     handleSeek(event)
   }, [handleSeek])
-
   useEffect(() => {
     if (!isDragging) return
-
     const handleMouseMove = (event) => {
       handleSeek(event)
     }
-
     const handleMouseUp = () => {
       setIsDragging(false)
     }
-
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
     }
   }, [isDragging, handleSeek])
-
   return (
     <div className="flex h-full flex-col gap-3 p-3">
       <div
@@ -1456,9 +1321,7 @@ function MusicContent({ player }) {
           </div>
         )}
       </div>
-
       {analyserRef && <MusicVisualizer analyserRef={analyserRef} isPlaying={isPlaying} />}
-
       <div className="flex items-center justify-center gap-3">
         <button
           type="button"
@@ -1497,7 +1360,6 @@ function MusicContent({ player }) {
           ⏭
         </button>
       </div>
-
       <div
         className="flex-1 space-y-2 overflow-y-auto rounded-xl border-2 p-3 custom-scroll"
         style={{
@@ -1551,7 +1413,6 @@ function MusicContent({ player }) {
     </div>
   )
 }
-
 function AboutContent() {
   return (
     <div
@@ -1578,7 +1439,6 @@ function AboutContent() {
     </div>
   )
 }
-
 function PhotosContent() {
   return (
     <div className="p-5 text-center space-y-4 flex flex-col items-center justify-center h-full">
@@ -1608,7 +1468,6 @@ function PhotosContent() {
     </div>
   )
 }
-
 function MailNotification({ onDismiss }) {
   return (
     <div
@@ -1637,7 +1496,6 @@ function MailNotification({ onDismiss }) {
     </div>
   )
 }
-
 function DesktopIcon({ icon, label, onClick, colors, badge }) {
   const palette = colors ?? {
     tileBg: PALETTE.accent,
@@ -1645,7 +1503,6 @@ function DesktopIcon({ icon, label, onClick, colors, badge }) {
     labelBg: PALETTE.bgAlt,
     labelBorder: PALETTE.border,
   }
-
   return (
     <div
       className="flex flex-col items-center gap-2 cursor-pointer transition-opacity hover:opacity-80"
@@ -1687,7 +1544,6 @@ function DesktopIcon({ icon, label, onClick, colors, badge }) {
     </div>
   )
 }
-
 function DotGrid() {
   return (
     <div
@@ -1700,7 +1556,6 @@ function DotGrid() {
     />
   )
 }
-
 function FloatingShapes() {
   const shapes = [
     { top: '8%', left: '12%', size: 22, color: PALETTE.primary },
@@ -1712,7 +1567,6 @@ function FloatingShapes() {
     { top: '12%', left: '52%', size: 16, color: PALETTE.accent },
     { top: '70%', left: '12%', size: 20, color: PALETTE.secondary },
   ]
-
   return (
     <div className="pointer-events-none absolute inset-0">
       {shapes.map((shape, i) => (
@@ -1733,7 +1587,6 @@ function FloatingShapes() {
     </div>
   )
 }
-
 function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, startOpen, onToggleStart, musicPlayer, musicWindowStatus }) {
   return (
     <div
@@ -1758,7 +1611,6 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
         >
           START
         </button>
-
         {startOpen && (
           <div
             className="start-menu absolute bottom-full left-0 mb-3 w-60 p-4 border-2"
@@ -1802,12 +1654,10 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
           </div>
         )}
       </div>
-
       <div className="flex flex-1 gap-2">
         {minimizedWindows.map(key => {
           const info = windowInfo[key]
           if (!info) return null
-
           if (key === 'music' && musicPlayer && musicWindowStatus === 'minimized') {
             return (
               <MiniMusicControls
@@ -1818,7 +1668,6 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
               />
             )
           }
-
           return (
             <button
               key={key}
@@ -1836,7 +1685,6 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
           )
         })}
       </div>
-
       <div
         className="px-4 py-2 border-2 font-mono text-sm font-semibold"
         style={{
@@ -1850,11 +1698,9 @@ function Taskbar({ minimizedWindows, closedWindows, windowInfo, onRestore, start
     </div>
   )
 }
-
 function MiniMusicControls({ player, palette, onRestore }) {
   const trackLabel = player.currentTrack?.display ?? 'Unknown Track'
   const progressWidth = Math.min(100, Math.max(0, player.progressPercent ?? 0))
-
   return (
     <div
       className="flex items-center gap-3 rounded-lg border-2 px-3 py-2 text-xs"
@@ -1953,7 +1799,6 @@ function MiniMusicControls({ player, palette, onRestore }) {
     </div>
   )
 }
-
 // SVG Icons
 function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.text }) {
   return (
@@ -1966,7 +1811,6 @@ function MailIcon({ main = PALETTE.mint, accent = '#ffffff', detail = PALETTE.te
     </svg>
   )
 }
-
 function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -1976,7 +1820,6 @@ function MusicIcon({ main = PALETTE.secondary, accent = PALETTE.mint, detail = P
     </svg>
   )
 }
-
 function ChatIcon({ main = PALETTE.accent, accent = PALETTE.lavender, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -1987,7 +1830,6 @@ function ChatIcon({ main = PALETTE.accent, accent = PALETTE.lavender, detail = P
     </svg>
   )
 }
-
 function FileIcon({ main = PALETTE.primary, accent = PALETTE.accent, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -1998,7 +1840,6 @@ function FileIcon({ main = PALETTE.primary, accent = PALETTE.accent, detail = PA
     </svg>
   )
 }
-
 function PhotoIcon({ main = PALETTE.sunshine, accent = PALETTE.accent, detail = PALETTE.text }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -2008,7 +1849,6 @@ function PhotoIcon({ main = PALETTE.sunshine, accent = PALETTE.accent, detail = 
     </svg>
   )
 }
-
 function HeartIcon() {
   return (
     <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
@@ -2017,5 +1857,4 @@ function HeartIcon() {
     </svg>
   )
 }
-
 export default Y2KBirthdayDesktop
