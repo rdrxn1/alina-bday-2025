@@ -70,7 +70,7 @@ export default function AlinaOSBoot({
 
   const currentTheme = themes[theme] || themes.light;
 
-  const versionLabel = theme === 'dark' ? 'v${version}' : `v${version}`;
+  const versionLabel = theme === 'dark' ? `v${version}` : `v${version}`;
 
   const bootMessages = theme === 'dark'
     ? [
