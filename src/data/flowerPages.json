@@ -1,41 +1,36 @@
 {
-  "bouquets": [
+  "pages": [
     {
-      "id": "pixel-study",
-      "title": "Pixel bloom study",
+      "id": "tulip-morning",
+      "title": "Tulip Morning",
       "showTitle": true,
-      "caption": "Swap any entry for your transparent bouquet PNGs to turn this into a floral mood board.",
+      "caption": "Swap these entries to match each bouquet's story.",
       "entries": [
         {
           "type": "text",
-          "content": "Each block below is powered by src/data/flowerPages.json. Update the JSON to reorder, rename, or add bouquets."
+          "content": "Use this JSON file to pair each arrangement with a note or dedication."
         },
         {
           "type": "image",
-          "file": "pixel-bouquet-rose.svg",
-          "alt": "Pixel bouquet with rosy petals"
-        },
-        {
-          "type": "image",
-          "file": "pixel-bouquet-sunrise.svg",
-          "alt": "Pixel bouquet in sunrise tones"
+          "file": "placeholder-bouquet.svg",
+          "alt": "Pink bouquet placeholder"
         }
       ]
     },
     {
-      "id": "mix-and-match",
+      "id": "starlight-bouquet",
       "title": "",
       "showTitle": false,
-      "caption": "Duplicate this page and point to any transparent PNG you drop into src/assets/flowers.",
+      "caption": "Pixel bouquets look extra cute with transparent PNGs!",
       "entries": [
         {
-          "type": "text",
-          "content": "Need more room? Add another object to the `bouquets` array. Each item becomes its own page."
+          "type": "image",
+          "file": "placeholder-bouquet.svg",
+          "alt": "Placeholder bouquet"
         },
         {
-          "type": "image",
-          "file": "pixel-bouquet-rose.svg",
-          "alt": "Rose bouquet placeholder"
+          "type": "text",
+          "content": "Duplicate this page to add more arrangements."
         }
       ]
     }

@@ -1,6 +1,6 @@
 # Birthday Desktop
 
-This Vite + React project powers a retro desktop that celebrates Alina. The new Photos app lets you curate multi-photo "pages" using a JSON document so you can keep adding memories without touching the UI code.
+This Vite + React project powers a retro desktop that celebrates Alina. The Photos and Flowers apps let you curate multi-photo "pages" using JSON so you can keep adding memories (or bouquets) without touching the UI code.
 
 ## Editing the Photos app
 
@@ -28,3 +28,27 @@ This Vite + React project powers a retro desktop that celebrates Alina. The new 
 - Add as many `entries` as you need. Every `image` entry references a filename inside `src/assets/photos`, while `text` entries render as little notes inline with your pictures.
 
 Whenever you save the JSON file or add/remove photo assets, the Photos window will automatically update with pagination controls.
+
+## Editing the Flowers app
+
+1. **Add bouquet images** (transparent PNGs, SVGs, etc.) to `src/assets/flowers`. The importer works the same way as the Photos app—any file you drop in becomes available immediately.
+2. **Describe bouquet spreads** inside `src/data/flowerPages.json`. The schema matches the Photos file so you can copy/paste entries between them.
+
+```jsonc
+{
+  "pages": [
+    {
+      "id": "bouquet-a",
+      "title": "Pixel Posies",
+      "showTitle": true,
+      "caption": "A short caption about the arrangement.",
+      "entries": [
+        { "type": "image", "file": "transparent-bouquet.png", "alt": "Bouquet description" },
+        { "type": "text", "content": "Dedication or story." }
+      ]
+    }
+  ]
+}
+```
+
+Save changes to the JSON file or swap bouquet assets and the Flowers window will refresh instantly.
