@@ -66,25 +66,25 @@ export default function AlinaOSBoot({
 
   const currentTheme = themes[theme] || themes.light;
 
-  const versionLabel = theme === 'dark' ? 'Initialising OS' : `v${version}`;
+  const versionLabel = theme === 'dark' ? 'v${version}' : `v${version}`;
 
   const bootMessages = theme === 'dark'
     ? [
-        `> Installed build: v${version}`,
-        '> Initialising core services...',
-        '> Loading critical subsystems...',
-        '> Verifying system integrity... OK',
-        '> Operator input required to continue.'
+        `> Initialising Build`,
+        '> Clearing Cache',
+        '> Loading Critical Systems...',
+        '> Verifying System Integrity',
+        '> Inititialisation Complete. Press Enter to Continue.'
       ]
     : [
-        '> INITIALIZING BIRTHDAY SYSTEM...',
-        '> LOADING SPARKLE MODULES...',
-        '> CHECKING CELEBRATION LEVELS... OK',
-        '> PREPARING SPECIAL SURPRISES...',
-        '> SYSTEM READY FOR FUN!'
+        '> Initialising...',
+        '> Checking ABPP Protocol...',
+        '> Making sure everything is perfect...',
+        '> Optimising the OS...',
+        '> The OS is Ready. Press Enter to Continue.'
       ];
 
-  const taglineText = theme === 'dark' ? null : 'A lavender night made just for you';
+  const taglineText = theme === 'dark' ? null : 'Made by Wallu';
 
   return (
     <>
