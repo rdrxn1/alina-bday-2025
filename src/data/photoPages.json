@@ -4,7 +4,6 @@
       "id": "januarydate",
       "title": "January Date",
       "showTitle": true,
-      "caption": "Snapshots of slow mornings and sleepy smiles.",
       "entries": [
         {
           "type": "text",
@@ -25,12 +24,11 @@
     {
       "id": "soulfest",
       "title": "Soulfest",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "I met your sister for the first time."
         },
         {
           "type": "image",
@@ -47,12 +45,11 @@
     {
       "id": "anniversary",
       "title": "Anniversary",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "The cutest date."
         },
         {
           "type": "image",
@@ -74,12 +71,11 @@
     {
       "id": "friends_date",
       "title": "Friends Date",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "I met your friends at a time when we were at a weird spot in the relationship."
         },
         {
           "type": "image",
@@ -96,12 +92,11 @@
     {
       "id": "skardu",
       "title": "Skardu",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "When the trip to Skardu finally happened."
         },
         {
           "type": "image",
@@ -117,13 +112,12 @@
     },
     {
       "id": "makeupdate",
-      "title": "Makeup Date",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "title": "Make up Date",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "Our first proper date after a while. You looked mesmerising."
         },
         {
           "type": "image",
@@ -139,13 +133,12 @@
     },
     {
       "id": "birthday",
-      "title": "Birthday",
-      "showTitle": false,
-      "caption": "Add as many files as you want for a single page—the layout grows with you.",
+      "title": "My Birthday",
+      "showTitle": true,
       "entries": [
         {
           "type": "text",
-          "content": "Captions live down here, but you can also sprinkle small notes among the images by using text entries."
+          "content": "The most amazing birthday I've ever had."
         },
         {
           "type": "image",
